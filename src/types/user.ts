@@ -4,7 +4,10 @@ export interface User {
   last_name: string;
   username: string;
   email: string;
-
   roles: string[];
   permissions: string[];
+}
+export interface Role {
+  id: number;
+  name: string;
 }

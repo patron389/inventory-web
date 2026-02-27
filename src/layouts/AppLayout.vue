@@ -1,6 +1,7 @@
 <template>
+  
   <div class="flex h-screen bg-gray-100">
-
+    <ToastContainer />
     <!-- Sidebar -->
     <Sidebar :collapsed="collapsed" />
 
@@ -20,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import ToastContainer from "@/shared/components/ToastContainer.vue";
 import { ref } from "vue";
 import Sidebar from "@/layouts/components/Sidebar.vue";
 import Topbar from "@/layouts/components/Topbar.vue";

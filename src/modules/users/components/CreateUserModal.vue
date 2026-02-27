@@ -1,0 +1,202 @@
+<template>
+  <div
+    v-if="modelValue"
+    class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+  >
+    <div class="bg-white w-full max-w-md rounded shadow p-6 space-y-4">
+
+      <h2 class="text-lg font-semibold">Create User</h2>
+      <!-- Role Selection -->
+      <select
+        v-model="form.role"
+        class="w-full border rounded px-3 py-2"
+      >
+        <option value="" disabled>Select Role</option>
+
+        <option
+          v-for="role in roles"
+          :key="role.id"
+          :value="role.name"
+        >
+          {{ role.name }}
+        </option>
+      </select>
+      <p v-if="errors.role" class="text-sm text-red-600 mt-1">
+        {{ errors.role[0] }}
+      </p>
+      <!-- First Name -->
+      <input
+        v-model="form.first_name"
+        placeholder="First Name"
+        class="w-full border rounded px-3 py-2"
+      />
+      <p v-if="errors.first_name" class="text-sm text-red-600 mt-1">
+        {{ errors.first_name[0] }}
+      </p>
+      <!-- Last Name -->
+      <input
+        v-model="form.last_name"
+        placeholder="Last Name"
+        class="w-full border rounded px-3 py-2"
+      />
+      <p v-if="errors.last_name" class="text-sm text-red-600 mt-1">
+        {{ errors.last_name[0] }}
+      </p>
+      <!-- Username -->
+      <input
+        v-model="form.username"
+        placeholder="Username"
+        class="w-full border rounded px-3 py-2"
+      />
+      <p v-if="errors.username" class="text-sm text-red-600 mt-1">
+        {{ errors.username[0] }}
+      </p>
+      <!-- Email -->
+      <input
+        v-model="form.email"
+        type="email"
+        placeholder="Email"
+        class="w-full border rounded px-3 py-2"
+      />
+      <p v-if="errors.email" class="text-sm text-red-600 mt-1">
+        {{ errors.email[0] }}
+      </p>
+      <!-- Password -->
+      <input
+        v-model="form.password"
+        type="password"
+        placeholder="Password"
+        class="w-full border rounded px-3 py-2"
+      />
+      <p v-if="errors.password" class="text-sm text-red-600 mt-1">
+        {{ errors.password[0] }}
+      </p>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-3 pt-2">
+        <button
+          @click="$emit('update:modelValue', false)"
+          class="px-4 py-2 bg-gray-200 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          @click="submit"
+          :disabled="loading"
+          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+        >
+          {{ loading ? "Creating..." : "Create" }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { User, Role } from "@/types/user";
+import { reactive, ref, onMounted } from "vue";
+import { createUser, fetchRoles } from "../api/users.api";
+import { useToastStore } from "@/shared/stores/toast.store";
+const toast = useToastStore();
+
+const errors = ref<Record<string, string[]>>({});
+/**
+ * Props
+ * modelValue → controls modal visibility (v-model from parent)
+ */
+defineProps<{
+  modelValue: boolean;
+}>();
+
+
+/**
+ * Emits
+ * update:modelValue → used for closing modal
+ * created → notifies parent that user was created successfully
+ */
+const emit = defineEmits([
+  "update:modelValue",
+  "created"
+]);
+
+/**
+ * Reactive form state
+ * Mirrors backend create user payload structure
+ */
+const form = reactive({
+  first_name: "",
+  last_name: "",
+  username: "",
+  email: "",
+  password: "",
+  role: "", // single string
+});
+
+/**
+ * Loading state
+ * Prevents double submission
+ * Used to disable button and show feedback
+ */
+const loading = ref(false);
+
+/**
+ * Available roles
+ * Populated from backend (Spatie roles)
+ */
+/**
+ * Fetch roles when modal mounts
+ * Keeps role list dynamic and backend-driven
+ */
+const roles = ref<Role[]>([]);
+
+onMounted(async () => {
+  const response = await fetchRoles();
+  roles.value = response.data.data;
+});
+
+/**
+ * Submit form handler
+ *
+ * 1. Sets loading state
+ * 2. Calls createUser API
+ * 3. Emits "created" event to refresh table
+ * 4. Closes modal
+ * 5. Resets loading state
+ */
+const submit = async () => {
+  loading.value = true;
+  errors.value = {}; // reset previous errors
+
+  try {
+    await createUser(form);
+    toast.show("User created successfully", "success");
+    emit("created");
+    emit("update:modelValue", false);
+
+    // Optional: reset form after success
+    Object.assign(form, {
+      first_name: "",
+      last_name: "",
+      username: "",
+      email: "",
+      password: "",
+      role: "",
+    });
+
+  } catch (error: any) {
+
+    // Check if validation error
+    if (error.status === 422 && error.errors) {
+      errors.value = error.errors;
+    } else {
+      toast.show("Unexpected server error", "error");
+    }
+
+  } finally {
+    loading.value = false;
+  }
+};
+
+</script>
