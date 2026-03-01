@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from "@/modules/auth/pages/LoginPage.vue";
 import DashboardPage from "@/modules/dashboard/pages/DashboardPage.vue";
+import ProductsPage from "@/modules/products/pages/ProductsPage.vue";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const routes = [
@@ -31,7 +32,12 @@ const routes = [
         component: () =>
           import("@/modules/users/pages/UsersPage.vue"),
         meta: { permission: "user.view" },
-      }
+      },
+      {
+        path: "products",
+        name: "products",
+        component: ProductsPage,
+      },
     ],
   },
   

@@ -1,42 +1,35 @@
 import { ref, onMounted } from "vue";
-import { fetchUsers } from "../api/users.api";
-import type { User } from "@/types/user";
+import { fetchProducts } from "../api/products.api";
+import type { Product } from "@/types/product.type";
 import type { ApiError } from "@/types/api";
 
-export function useUsers() {
+export function useProducts() {
 
-  // actual users list
-  const users = ref<User[]>([]);
-
-  // loading state
+  const products = ref<Product[]>([]);
   const loading = ref(false);
-
-  // error message
   const error = ref<string | null>(null);
 
-  // pagination meta
   const currentPage = ref(1);
   const lastPage = ref(1);
   const total = ref(0);
 
-  /**
-   * Load users from API
-   */
-  const loadUsers = async (
-  page = 1,
-  searchQuery = "",
-  statusFilter = "all"
-  ) => {
+  const loadProducts = async (  
+    page = 1,
+    searchQuery = "",
+    statusFilter = "all") => {
     loading.value = true;
     error.value = null;
 
     try {
-      const response = await fetchUsers(page, searchQuery, statusFilter);
+      const response = await fetchProducts(page, searchQuery, statusFilter);
 
-      // Users array
-      users.value = response.data.data;
+      // Normalize here
+      products.value = response.data.data.map((product: any) => ({
+        ...product,
+        price: Number(product.price),
+        is_active: product.is_active === 1,
+      }));
 
-      // Pagination metadata
       currentPage.value = response.data.meta.current_page;
       lastPage.value = response.data.meta.last_page;
       total.value = response.data.meta.total;
@@ -49,16 +42,15 @@ export function useUsers() {
     }
   };
 
-  // load first page automatically
   onMounted(() => {
-    loadUsers();
+    loadProducts();
   });
 
   return {
-    users,
+    products,
     loading,
     error,
-    loadUsers,
+    loadProducts,
     currentPage,
     lastPage,
     total,

@@ -3,7 +3,7 @@
 
     <!-- Loading -->
     <div v-if="loading">
-    <table class="min-w-full divide-y divide-gray-200">
+    <table class="min-w-full divide-y divide-gray-200 ">
         <thead class="bg-gray-50">
         <tr>
             <th
@@ -33,7 +33,7 @@
     <!-- Empty -->
     <div
     v-else-if="!rows.length"
-    class="p-10 text-center text-gray-500"
+    class="p-10 text-center text-gray-500 "
     >
     <p class="text-lg font-medium">No data found</p>
     <p class="text-sm mt-2">
@@ -42,7 +42,7 @@
     </div>
 
     <!-- Table -->
-    <table v-else class="min-w-full divide-y divide-gray-200">
+    <table v-else class="min-w-full divide-y divide-gray-200 border">
       <thead class="bg-gray-50">
         <tr>
           <th
@@ -94,7 +94,7 @@
     </table>
 
     <!-- Optional Pagination Slot -->
-    <div v-if="$slots.pagination" class="p-4 border-t">
+    <div v-if="$slots.pagination" class="px-4 pt-4">
       <slot name="pagination" />
     </div>
 

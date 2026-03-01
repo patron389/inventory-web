@@ -1,15 +1,58 @@
 <template>
-  <div
-    v-if="modelValue"
-    class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+  <FormModal
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    title="Create User"
   >
-    <div class="bg-white w-full max-w-md rounded shadow p-6 space-y-4">
+    <!-- Body -->
 
-      <h2 class="text-lg font-semibold">Create User</h2>
-      <!-- Role Selection -->
-      <select
+    <div class="space-y-4">
+
+      <div class="grid grid-cols-2 gap-6">
+        <FormInput
+          v-model="form.first_name"
+          label="First Name"
+          :error="errors.first_name"
+        />
+        <FormInput
+          v-model="form.last_name"
+          label="Last Name"
+          :error="errors.last_name"
+        />
+      </div>
+
+      <FormInput
+        v-model="form.email"
+        label="Email"
+        type="email"
+        :error="errors.email"
+      />
+
+      <div class="grid grid-cols-2 gap-6">
+        <FormInput
+          v-model="form.username"
+          label="Username"
+          :error="errors.username"
+        />
+
+        <FormInput
+          v-model="form.phone_no"
+          label="Phone no"
+          :error="errors.phone_no"
+        />
+      </div>
+
+      <FormInput
+        v-model="form.password"
+        label="Password"
+        type="password"
+        :error="errors.password"
+      />
+
+      <FormSelect
         v-model="form.role"
-        class="w-full border rounded px-3 py-2"
+        label="Role"
+        :error="errors.role"
       >
         <option value="" disabled>Select Role</option>
 
@@ -20,60 +63,13 @@
         >
           {{ role.name }}
         </option>
-      </select>
-      <p v-if="errors.role" class="text-sm text-red-600 mt-1">
-        {{ errors.role[0] }}
-      </p>
-      <!-- First Name -->
-      <input
-        v-model="form.first_name"
-        placeholder="First Name"
-        class="w-full border rounded px-3 py-2"
-      />
-      <p v-if="errors.first_name" class="text-sm text-red-600 mt-1">
-        {{ errors.first_name[0] }}
-      </p>
-      <!-- Last Name -->
-      <input
-        v-model="form.last_name"
-        placeholder="Last Name"
-        class="w-full border rounded px-3 py-2"
-      />
-      <p v-if="errors.last_name" class="text-sm text-red-600 mt-1">
-        {{ errors.last_name[0] }}
-      </p>
-      <!-- Username -->
-      <input
-        v-model="form.username"
-        placeholder="Username"
-        class="w-full border rounded px-3 py-2"
-      />
-      <p v-if="errors.username" class="text-sm text-red-600 mt-1">
-        {{ errors.username[0] }}
-      </p>
-      <!-- Email -->
-      <input
-        v-model="form.email"
-        type="email"
-        placeholder="Email"
-        class="w-full border rounded px-3 py-2"
-      />
-      <p v-if="errors.email" class="text-sm text-red-600 mt-1">
-        {{ errors.email[0] }}
-      </p>
-      <!-- Password -->
-      <input
-        v-model="form.password"
-        type="password"
-        placeholder="Password"
-        class="w-full border rounded px-3 py-2"
-      />
-      <p v-if="errors.password" class="text-sm text-red-600 mt-1">
-        {{ errors.password[0] }}
-      </p>
+      </FormSelect>
 
-      <!-- Buttons -->
-      <div class="flex justify-end gap-3 pt-2">
+    </div>
+
+    <!-- Footer -->
+    <template #footer>
+      <div class="flex justify-end gap-3">
         <button
           @click="$emit('update:modelValue', false)"
           class="px-4 py-2 bg-gray-200 rounded"
@@ -89,9 +85,9 @@
           {{ loading ? "Creating..." : "Create" }}
         </button>
       </div>
+    </template>
 
-    </div>
-  </div>
+  </FormModal>
 </template>
 
 <script setup lang="ts">
@@ -99,6 +95,9 @@ import type { User, Role } from "@/types/user";
 import { reactive, ref, onMounted } from "vue";
 import { createUser, fetchRoles } from "../api/users.api";
 import { useToastStore } from "@/shared/stores/toast.store";
+import FormInput from "@/shared/components/form/FormInput.vue";
+import FormSelect from "@/shared/components/form/FormSelect.vue";
+import FormModal from "@/shared/components/form/FormModal.vue";
 const toast = useToastStore();
 
 const errors = ref<Record<string, string[]>>({});
@@ -130,6 +129,7 @@ const form = reactive({
   last_name: "",
   username: "",
   email: "",
+  phone_no: "",
   password: "",
   role: "", // single string
 });

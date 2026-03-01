@@ -6,31 +6,51 @@
     ]"
   >
     <!-- Logo -->
-    <div class="p-6 font-bold border-b">
+    <div class="py-6 px-4 font-bold border-b">
       <span v-if="!collapsed">Inventory</span>
       <span v-else>INV</span>
     </div>
 
-    <nav class="flex-1 p-4 space-y-2">
+    <nav class="text-sm flex-1 p-4 space-y-2">
 
       <!-- Dashboard -->
-      <RouterLink
-        to="/dashboard"
-        class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100"
-      >
-        <LayoutDashboard class="w-5 h-5" />
-        <span v-if="!collapsed">Dashboard</span>
-      </RouterLink>
+       <div class="main py-3 border-b">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Main</p>
+        <RouterLink
+          to="/dashboard"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <LayoutDashboard class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">Dashboard</span>
+        </RouterLink>
+       </div>
+
+      <div class="products py-4 border-b">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Inventory</p>
+        <RouterLink
+          v-if="auth.can('user.view')"
+          to="/products"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <Box class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">Products</span>
+        </RouterLink>
+      </div>
+
+      <div class="users py-4">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">User Management</p>
+        <RouterLink
+          v-if="auth.can('user.view')"
+          to="/users"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <Users class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">Users</span>
+        </RouterLink>
+      </div>
 
       <!-- Users -->
-      <RouterLink
-        v-if="auth.can('user.view')"
-        to="/users"
-        class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100"
-      >
-        <Users class="w-5 h-5" />
-        <span v-if="!collapsed">Users</span>
-      </RouterLink>
+
 
     </nav>
   </aside>
@@ -38,7 +58,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-import { LayoutDashboard, Users } from "lucide-vue-next";
+import { LayoutDashboard, Users, Box } from "lucide-vue-next";
 
 defineProps<{
   collapsed: boolean;

@@ -3,7 +3,11 @@
 
     <!-- Header -->
     <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-semibold">Dashboard</h1>
+      <div>
+        <h1 class="text-2xl font-semibold">Welcome, {{ auth.user?.first_name }} </h1>
+        <p class="text-base text-neutral-600 mt-2">Lorem ipsum dolor sit</p>
+      </div>
+      
 
       <button
         @click="loadSummary"
@@ -61,7 +65,11 @@
       </StatCard>
 
     </div>
-
+    <WarehouseChart
+    :loading="loading"
+      v-if="summary?.stock_per_warehouse"
+      :stockPerWarehouse="summary.stock_per_warehouse"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -70,6 +78,7 @@ import { useAuthStore } from "@/modules/auth/store/auth.store";
 import { useDashboard } from "../composables/useDashboard";
 import StatCard from "@/shared/components/StatCard.vue";
 import SkeletonCard from "@/shared/components/SkeletonCard.vue";
+import WarehouseChart from "../components/WarehouseChart.vue";
 
 import {
   Package,
