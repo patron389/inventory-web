@@ -2,7 +2,7 @@
     <FormModal
         :modelValue="modelValue"
         @update:modelValue="$emit('update:modelValue', $event)"
-        title="Create User"
+        title="Create Products"
     >
 
     </FormModal>

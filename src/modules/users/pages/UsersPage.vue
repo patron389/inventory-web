@@ -4,7 +4,7 @@
     <!-- Page Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-semibold">Users List</h1>
+        <h1 class="text-2xl font-semibold">User List</h1>
         <p class="text-base text-neutral-500 mt-2">Manage your users</p>
       </div>
 

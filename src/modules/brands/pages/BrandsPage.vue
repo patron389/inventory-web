@@ -4,24 +4,24 @@
     <!-- Page Header -->
     <div class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-semibold">Product List</h1>
-        <p class="text-base text-neutral-500 mt-2">Manage your products</p>
+        <h1 class="text-2xl font-semibold">Brand List</h1>
+        <p class="text-base text-neutral-500 mt-2">Manage your brands</p>
       </div>
 
       <!-- Create button (permission aware) -->
        <div class="flex gap-3">
         <button
-          @click="() => loadProducts()"
+          @click="() => loadBrands()"
           class="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
         >
           Refresh
         </button>
         <button
-          v-if="auth.can('user.create')"
+          v-if="auth.can('brand.create')"
           @click="showCreateModal = true"
           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Create Product
+          Create Brand
         </button>
        </div>
 
@@ -34,7 +34,7 @@
           <input
             v-model="search"
             type="text"
-            placeholder="Search products..."
+            placeholder="Search brands..."
             class="border rounded px-3 py-2 w-64"
           />
           <!-- Status Filter -->
@@ -50,25 +50,16 @@
       </div>
       <div class="p-5">
       <DataTable
-        :rows="products"
+        :rows="brands"
         :columns="columns"
         :loading="loading"
       >
-        <template #cell-is_active="{ row }">
-          <span   :class="[
-                  'px-3 py-2 text-xs font-medium rounded-md',
-                  row.is_active
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-600'
-                ]">
-            {{ row.is_active ? 'Active' : 'Inactive' }}
-          </span>
-        </template>
-        <template #cell-brand="{ row }">
+        <!-- Custom Status Column -->
+        <template #cell-name="{ row }">
           <div class="flex items-center gap-3">
             <img
-              v-if="row.brand?.image"
-              :src="row.brand.image"
+              v-if="row.image"
+              :src="row.image"
               alt="brand image"
               class="w-10 h-10 object-cover rounded-md border"
             />
@@ -81,15 +72,26 @@
               N/A
             </div>
 
-            <span>
-              {{ row.brand?.name ?? "N/A" }}
+            <span class="font-medium text-gray-800">
+              {{ row.name }}
             </span>
           </div>
         </template>
+        <template #cell-is_active="{ row }">
+          <span   :class="[
+                  'px-3 py-2 text-xs font-medium rounded-md',
+                  row.is_active
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-600'
+                ]">
+            {{ row.is_active ? 'Active' : 'Inactive' }}
+          </span>
+        </template>
+
         <!-- Actions Column -->
         <template #actions="{ row }">
           <button
-            v-if="auth.can('user.update')"
+            v-if="auth.can('brand.update')"
             @click="openEdit(row)"
             class="text-indigo-600 hover:underline mr-3"
           >
@@ -97,7 +99,7 @@
           </button>
 
           <button
-            v-if="auth.can('user.delete')"
+            v-if="auth.can('brand.delete')"
             class="text-red-600 hover:underline"
           >
             <Trash2 :size="16" />
@@ -113,7 +115,7 @@
             <div class="space-x-2">
               <button
                 :disabled="currentPage === 1"
-                @click="loadProducts(currentPage - 1)"
+                @click="loadBrands(currentPage - 1)"
                 class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
               >
                 Prev
@@ -121,7 +123,7 @@
 
               <button
                 :disabled="currentPage === lastPage"
-                @click="loadProducts(currentPage + 1)"
+                @click="loadBrands(currentPage + 1)"
                 class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
               >
                 Next
@@ -136,72 +138,55 @@
     </div>
 
   </div>
-  <CreateProductModal
+  <CreateBrandModal
     v-model="showCreateModal"
-    @created="loadProducts"
+    @created="loadBrands"
   />
-  <!-- <EditUserModal
+  <EditBrandModal
     v-model="showEditModal"
-    :user="selectedUser"
-    @updated="loadProducts"
-  /> -->
+    :brand="selectedBrand"
+    @updated="loadBrands"
+  />
 </template>
 
 <script setup lang="ts">
 
 import { ref,watch } from "vue";
-import CreateProductModal from "../components/CreateProductsModal.vue";
+import CreateBrandModal from "../components/CreateBrandModal.vue";
 // import EditUserModal from "../components/EditUserModal.vue";
-import type { User } from "@/types/user";
+import EditBrandModal from "../components/EditBrandModal.vue";
 import {
   Edit,
   Trash2
 } from "lucide-vue-next";
+
 const showCreateModal = ref(false);
-// Import reusable DataTable component
 import DataTable from "@/shared/components/DataTable.vue";
-
-// Import composable that handles API logic
-import { useProducts } from "../composables/useProducts";
-
-// Import auth store for permission checks
+import { useBrands } from "../composables/useBrands";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-
+import type { Brand } from "@/types/brand";
 const search = ref("")
 const statusFilter = ref<"all" | "active" | "inactive">("all")
+const auth = useAuthStore();
 watch([search, statusFilter], () => {
-  loadProducts(1, search.value, statusFilter.value)
+  loadBrands(1, search.value, statusFilter.value)
 })
 const showEditModal = ref(false);
-const selectedUser = ref<User | null>(null);
-// Access auth store (for permission-based buttons)
-const auth = useAuthStore();
+const selectedBrand = ref<Brand | null>(null);
 
-const openEdit = (user: User) => {
-  selectedUser.value = user;
+
+const openEdit = (brand: Brand) => {
+  selectedBrand.value = brand;
   showEditModal.value = true;
 };
-// Destructure state from composable
-// users  → actual user data
-// loading → loading state for API call
-const { products, loading, currentPage, lastPage, loadProducts } = useProducts();
 
-/**
- * Define which columns DataTable should render.
- *
- * key   → object property name from each row
- * label → table header text
- */
+const { brands, loading, currentPage, lastPage, loadBrands } = useBrands();
+
 const columns = [
-  { key: "name", label: "Product Name" },
-  { key: "category", label: "Category" },
-  { key: "brand", label: "Brand" },
-  { key: "sku", label: "SKU " },
-  { key: "unit", label: "Unit" },
-  { key: "price_formatted", label: "Price" },
-  { key: "is_active", label: "Status" },
+  { key: "name", label: "Brand Name" },
   { key: "created_at_formatted", label: "Created Date" },
   { key: "updated_at_formatted", label: "Updated Date" },
+  { key: "is_active", label: "Status" },
 ];
 
 </script>

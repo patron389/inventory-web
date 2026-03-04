@@ -1,16 +1,9 @@
 <template>
-  <!-- 
-    Only render modal if modelValue is true.
-    Parent controls visibility using v-model.
-  -->
+
   <div
     v-if="modelValue"
     class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
   >
-    <!-- 
-      Modal container.
-      maxWidth can be customized later if needed.
-    -->
     <div class="bg-white w-full max-w-lg rounded shadow p-6 space-y-4">
 
       <!-- Header -->

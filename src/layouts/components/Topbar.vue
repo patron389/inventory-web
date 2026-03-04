@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
+  <header class="bg-white shadow px-4 py-4 flex justify-between items-center">
 
     <!-- Left: Burger menu -->
     <button
@@ -13,7 +13,7 @@
     <div class="relative user-menu">
       <button
         @click="toggleDropdown"
-        class="flex items-center gap-2 px-4 py-2 text-sm hover:text-blue-600"
+        class="flex items-center gap-2 px-2 py-2 text-sm hover:text-blue-600"
       >
         {{ auth.user?.first_name }} {{ auth.user?.last_name }}
         <ChevronDown :size="16" />

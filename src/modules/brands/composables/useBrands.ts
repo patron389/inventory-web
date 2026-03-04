@@ -1,11 +1,11 @@
 import { ref, onMounted } from "vue";
-import { fetchProducts } from "../api/products.api";
-import type { Product } from "@/types/product.type";
+import { fetchBrands } from "../api/brands.api";
+import type { Brand } from "@/types/brand";
 import type { ApiError } from "@/types/api";
 
-export function useProducts() {
+export function useBrands() {
 
-  const products = ref<Product[]>([]);
+  const brands = ref<Brand[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -13,7 +13,7 @@ export function useProducts() {
   const lastPage = ref(1);
   const total = ref(0);
 
-  const loadProducts = async (  
+  const loadBrands = async (  
     page = 1,
     searchQuery = "",
     statusFilter = "all") => {
@@ -21,11 +21,12 @@ export function useProducts() {
     error.value = null;
 
     try {
-      const response = await fetchProducts(page, searchQuery, statusFilter);
+      const response = await fetchBrands(page, searchQuery, statusFilter);
 
       // Normalize here
-      products.value = response.data.data.map((product: any) => ({
+      brands.value = response.data.data.map((product: any) => ({
         ...product,
+        price: Number(product.price),
         is_active: product.is_active === 1,
       }));
 
@@ -42,14 +43,14 @@ export function useProducts() {
   };
 
   onMounted(() => {
-    loadProducts();
+    loadBrands();
   });
 
   return {
-    products,
+    brands,
     loading,
     error,
-    loadProducts,
+    loadBrands,
     currentPage,
     lastPage,
     total,
