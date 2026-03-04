@@ -191,6 +191,8 @@ const columns = [
   { key: "phone_no", label: "Phone no" },
   { key: "email", label: "Email" },
   { key: "is_active", label: "Status" },
+  { key: "created_at_formatted", label: "Created Date" },
+  { key: "updated_at_formatted", label: "Updated Date" },
 ];
 
 </script>

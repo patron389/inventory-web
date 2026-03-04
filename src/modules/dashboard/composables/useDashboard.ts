@@ -27,15 +27,20 @@ export function useDashboard() {
       loading.value = false;
     }
   };
-    let interval: number;
-    onMounted(() => {
+  onMounted(() => {
     loadSummary();
-    interval = window.setInterval(loadSummary, 30000); // 30 seconds
-    });
+  });
+  // Temporarilry remove the auto refresh on ther
+    // let interval: number;
+    // onMounted(() => {
+    // loadSummary();
+    // interval = window.setInterval(loadSummary, 30000); // 30 seconds
+    // });
 
-    onUnmounted(() => {
-    clearInterval(interval);
-    });
+    // onUnmounted(() => {
+    // clearInterval(interval);
+    // });
+    
   return {
     summary,
     loading,

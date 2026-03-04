@@ -28,6 +28,7 @@
       <div class="products py-4 border-b"
       v-if="auth.can('product.view')">
         <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Inventory</p>
+        <!-- PRODUCT  -->
         <RouterLink
           v-if="auth.can('product.view')"
           to="/products"
@@ -36,6 +37,7 @@
           <Box class="w-4 h-4 text-gray-600" />
           <span v-if="!collapsed">Products</span>
         </RouterLink>
+        <!-- BRAND  -->
         <RouterLink
           v-if="auth.can('brand.view')"
           to="/brands"
@@ -43,6 +45,15 @@
         >
           <Sparkle class="w-4 h-4 text-gray-600" />
           <span v-if="!collapsed">Brands</span>
+        </RouterLink>
+        <!-- CATEGORY  -->
+        <RouterLink
+          v-if="auth.can('category.view')"
+          to="/categories"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <ListOrdered class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">Category</span>
         </RouterLink>
       </div>
 
@@ -67,7 +78,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-import { Sparkle, Users, Box, LayoutGrid } from "lucide-vue-next";
+import { Sparkle, Users, Box, LayoutGrid, ListOrdered, } from "lucide-vue-next";
 
 defineProps<{
   collapsed: boolean;

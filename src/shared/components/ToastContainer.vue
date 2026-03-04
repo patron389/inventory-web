@@ -5,10 +5,10 @@
       v-for="toast in toastStore.toasts"
       :key="toast.id"
       :class="[
-        'px-4 py-3 rounded shadow text-white transition-all',
-        toast.type === 'success' && 'bg-green-600',
-        toast.type === 'error' && 'bg-red-600',
-        toast.type === 'info' && 'bg-blue-600',
+        'px-4 py-3 rounded shadow text-neutral-600 transition-all',
+        toast.type === 'success' && 'bg-white border-green-600 border-2',
+        toast.type === 'error' && 'bg-white border-red-600 border-2',
+        toast.type === 'info' && 'bg-white border-blue-600 border-2',
       ]"
     >
       <div class="flex justify-between items-center gap-4">
@@ -16,7 +16,7 @@
 
         <button
           @click="toastStore.remove(toast.id)"
-          class="text-white/80 hover:text-white"
+          class="text-neutral-600 hover:text-neutral-800"
         >
           ✕
         </button>
