@@ -13,24 +13,25 @@
     </label>
 
     <!-- 
-      Controlled input.
+      Controlled textarea.
       Uses modelValue prop instead of v-model internally.
       Emits update:modelValue on change.
     -->
-    <input
-      :type="type"
+    <textarea
       :value="modelValue"
       @input="updateValue"
+      rows="4"
       :class="[
+
         // base styling
-        'w-full border rounded px-3 py-2 focus:outline-none focus:ring-2',
+        'w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 resize-none',
 
         // dynamic styling if error exists
         error
           ? 'border-red-500 focus:ring-red-200'
           : 'border-gray-300 focus:ring-blue-200'
       ]"
-    />
+    ></textarea>
 
     <!-- 
       Displays first validation error message if present.
@@ -51,15 +52,13 @@
 /**
  * Props definition.
  *
- * modelValue → current value (for v-model binding)
- * label      → optional label above input
- * type       → input type (text, email, password, etc.)
+ * modelValue → current textarea value
+ * label      → optional label above textarea
  * error      → Laravel validation error array (string[])
  */
 defineProps<{
-  modelValue: string | number | null;
+  modelValue: string;
   label?: string;
-  type?: string;
   error?: string[];
 }>();
 
@@ -69,11 +68,10 @@ defineProps<{
 const emit = defineEmits(["update:modelValue"]);
 
 /**
- * Handles input event and emits updated value.
- * Keeps component fully controlled.
+ * Handles textarea input and emits updated value.
  */
 const updateValue = (event: Event) => {
-  const target = event.target as HTMLInputElement;
+  const target = event.target as HTMLTextAreaElement;
   emit("update:modelValue", target.value);
 };
 

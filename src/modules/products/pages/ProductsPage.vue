@@ -70,7 +70,7 @@
               v-if="row.brand?.image"
               :src="row.brand.image"
               alt="brand image"
-              class="w-10 h-10 object-cover rounded-md border"
+              class="w-10  object-contain bg-white rounded-md border"
             />
 
             <!-- Fallback if no image -->
@@ -89,7 +89,7 @@
         <!-- Actions Column -->
         <template #actions="{ row }">
           <button
-            v-if="auth.can('user.update')"
+            v-if="auth.can('product.update')"
             @click="openEdit(row)"
             class="text-indigo-600 hover:underline mr-3"
           >
@@ -97,7 +97,7 @@
           </button>
 
           <button
-            v-if="auth.can('user.delete')"
+            v-if="auth.can('product.delete')"
             class="text-red-600 hover:underline"
           >
             <Trash2 :size="16" />
@@ -140,24 +140,24 @@
     v-model="showCreateModal"
     @created="loadProducts"
   />
-  <!-- <EditUserModal
+  <EditProductModal
     v-model="showEditModal"
-    :user="selectedUser"
+    :product="selectedProduct"
     @updated="loadProducts"
-  /> -->
+  />
 </template>
 
 <script setup lang="ts">
 
 import { ref,watch } from "vue";
 import CreateProductModal from "../components/CreateProductsModal.vue";
-// import EditUserModal from "../components/EditUserModal.vue";
-import type { User } from "@/types/user";
+import EditProductModal from "../components/EditProductsModal.vue";
 import {
   Edit,
   Trash2
 } from "lucide-vue-next";
 const showCreateModal = ref(false);
+const showEditModal = ref(false);
 // Import reusable DataTable component
 import DataTable from "@/shared/components/DataTable.vue";
 
@@ -166,19 +166,19 @@ import { useProducts } from "../composables/useProducts";
 
 // Import auth store for permission checks
 import { useAuthStore } from "@/modules/auth/store/auth.store";
+import type { Product } from "@/types/product.type";
 
 const search = ref("")
 const statusFilter = ref<"all" | "active" | "inactive">("all")
 watch([search, statusFilter], () => {
   loadProducts(1, search.value, statusFilter.value)
 })
-const showEditModal = ref(false);
-const selectedUser = ref<User | null>(null);
+const selectedProduct = ref<Product | null>(null);
 // Access auth store (for permission-based buttons)
 const auth = useAuthStore();
 
-const openEdit = (user: User) => {
-  selectedUser.value = user;
+const openEdit = (product: Product) => {
+  selectedProduct.value = product;
   showEditModal.value = true;
 };
 // Destructure state from composable

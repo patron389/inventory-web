@@ -174,6 +174,7 @@ const openEdit = (user: User) => {
   selectedUser.value = user;
   showEditModal.value = true;
 };
+
 // Destructure state from composable
 // users  → actual user data
 // loading → loading state for API call

@@ -66,7 +66,7 @@
               v-if="row.brand?.image"
               :src="row.brand.image"
               alt="brand image"
-              class="w-10 h-10 object-cover rounded-md border"
+              class="w-10  object-contain rounded-md border"
             />
 
             <!-- Fallback if no image -->

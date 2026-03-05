@@ -8,7 +8,7 @@
         <FormInput
           v-model="form.name"
           label="Product Name"
-          :error="errors.first_name"
+          :error="errors.name"
         />
     <div class="grid grid-cols-2 gap-6">
         <SearchSelect
@@ -18,6 +18,7 @@
         optionLabel="name"
         placeholder="Select a Category"
         :reduce="(c) => c.id"
+        :error="errors.category_id"
         />
         <SearchSelect
         v-model="form.brand_id"
@@ -26,6 +27,7 @@
         optionLabel="name"
         placeholder="Select a Brand"
         :reduce="(b) => b.id"
+        :error="errors.brand_id"
         />
     </div>
         <!-- <FormInput
@@ -98,7 +100,7 @@
           :disabled="loading"
           class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
-          {{ loading ? "Creating..." : "Create" }}
+          {{ loading ? "Updating..." : "Update" }}
         </button>
       </div>
     </template>
@@ -110,8 +112,8 @@ import type { Category } from "@/types/category";
 import type { Brand } from "@/types/brand";
 import { fetchBrands } from "@/modules/brands/api/brands.api";
 import { fetchCategory } from "@/modules/category/api/category.api";
-import { reactive, ref, onMounted } from "vue";
-import {createProduct} from "../api/products.api";
+import { reactive, ref, onMounted, watch } from "vue";
+import {updateProduct} from "../api/products.api";
 import FormModal from "@/shared/components/form/FormModal.vue";
 import FormInput from "@/shared/components/form/FormInput.vue";
 import FormTextArea from "@/shared/components/form/FormTextArea.vue";
@@ -146,18 +148,19 @@ const generateSku = () => {
 
   form.sku = `${categoryCode}-${brandCode}-${random}`;
 };
-const toast = useToastStore();
-
-defineProps<{
+const props = defineProps<{
   modelValue: boolean;
+  product: Product | null;
 }>();
+
+const toast = useToastStore();
 
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
 const emit = defineEmits([
   "update:modelValue",
-  "created"
+  "updated"
 ]);
 
 const categories = ref<Category[]>([]);
@@ -179,26 +182,44 @@ onMounted(async () => {
 });
 const form = reactive({
   name: "",
-  category_id: "" as number | "",
-  brand_id: "" as number | "",
+  category_id: null as number | null,
+  brand_id: null as number | null,
   sku: "",
   unit: "",
   description: "",
-  price: "" as number | "",
+  price: null as number | null,
+  is_active: true as boolean,
 });
+
+watch(
+  () => props.product,
+  (p) => {
+    if (!p) return
+    form.name = p.name ?? ""
+    form.category_id = p.category_id ?? null
+    form.brand_id = p.brand_id ?? null
+    form.sku = p.sku ?? ""
+    form.unit = p.unit ?? ""
+    form.description = p.description ?? ""
+    form.price = p.price ?? null
+    form.is_active = Boolean(p.is_active)
+  },
+  { immediate: true }
+)
+
 const submit = async () => {
   loading.value = true;
   errors.value = {}; // reset previous errors
 
   try {
-    await createProduct({
+    await updateProduct(props.product!.id, {
       ...form,
       category_id: Number(form.category_id),
       brand_id: Number(form.brand_id),
       price: Number(form.price),
     });
-    toast.show("Product created successfully", "success");
-    emit("created");
+    toast.show("Product updated successfully", "success");
+    emit("updated");
     emit("update:modelValue", false);
 
     // Optional: reset form after success

@@ -18,11 +18,12 @@ export function fetchProducts(
 
 export function createProduct(payload: {
   name: string
+  category_id: number
+  brand_id: number
   sku: string
+  unit: string
+  description: string
   price: number
-  stock_quantity: number
-  low_stock_threshold: number
-  is_active: boolean
 }) {
   return api.post("/products", payload)
 }
@@ -31,11 +32,12 @@ export function updateProduct(
   id: number,
   payload: {
     name: string
+    category_id: number
+    brand_id: number
     sku: string
+    unit: string
+    description: string
     price: number
-    stock_quantity: number
-    low_stock_threshold: number
-    is_active: boolean
   }
 ) {
   return api.put(`/products/${id}`, payload)
