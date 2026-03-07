@@ -186,6 +186,7 @@ const form = reactive({
   description: "",
   price: "" as number | "",
 });
+
 const submit = async () => {
   loading.value = true;
   errors.value = {}; // reset previous errors

@@ -65,11 +65,14 @@
       </StatCard>
 
     </div>
-    <WarehouseChart
-    :loading="loading"
-      v-if="summary?.stock_per_warehouse"
-      :stockPerWarehouse="summary.stock_per_warehouse"
-    />
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <WarehouseChart
+      :loading="loading"
+        v-if="summary?.stock_per_warehouse"
+        :stockPerWarehouse="summary.stock_per_warehouse"
+      />
+    </div>
+
   </div>
 </template>
 <script setup lang="ts">

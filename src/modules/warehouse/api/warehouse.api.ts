@@ -15,3 +15,28 @@ export function fetchWarehouse(
     }
   })
 }
+
+export function createWarehouse(payload: {
+  name: string
+  code: string
+  location: string
+  contact_person: string
+  contact_phone: string
+  contact_email: string
+  description: string
+}) {
+  return api.post("/warehouses", payload)
+}
+export function updateWarehouse(
+  id:number,
+  payload: {
+  name: string
+  code: string
+  location: string
+  contact_person: string
+  contact_phone: string
+  contact_email: string
+  description: string
+}) {
+  return api.put(`/warehouses/${id}`, payload)
+}

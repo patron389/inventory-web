@@ -6,7 +6,7 @@
     </h3>
 
     <!-- Bar chart -->
-    <div class="h-80">
+    <div class="">
       <!-- Skeleton -->
       <div
         v-if="loading"

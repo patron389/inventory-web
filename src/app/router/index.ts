@@ -5,6 +5,7 @@ import ProductsPage from "@/modules/products/pages/ProductsPage.vue";
 import BrandsPage from "@/modules/brands/pages/BrandsPage.vue";
 import CategoryPage from "@/modules/category/pages/CategoryPage.vue";
 import WarehousePage from "@/modules/warehouse/pages/WarehousePage.vue";
+import StockPage from "@/modules/stocks/pages/StockPage.vue";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const routes = [
@@ -56,6 +57,11 @@ const routes = [
         name: "warehouse",
         component: WarehousePage,
       },
+      {
+        path: "stocks",
+        name: "stock",
+        component: StockPage,
+      },
     ],
   },
   
@@ -85,5 +91,21 @@ router.beforeEach(async (to) => {
   if (to.meta.guest && auth.isAuthenticated) {
     return "/dashboard";
   }
+    if (!auth.isBootstrapped) {
+    await auth.fetchUser();
+  }
+
+  if (to.meta.auth && !auth.isAuthenticated) {
+    return "/login";
+  }
+
+  if (to.meta.guest && auth.isAuthenticated) {
+    return "/dashboard";
+  }
+
+  if (to.meta.permission && !auth.can(to.meta.permission as string)) {
+    return "/dashboard";
+  }
+  return true;
 });
 export default router;

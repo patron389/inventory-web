@@ -14,13 +14,13 @@
                 >
                 Refresh
                 </button>
-                <!-- <button
-                v-if="auth.can('category.create')"
+                <button
+                v-if="auth.can('warehouse.create')"
                 @click="showCreateModal = true"
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
-                Create Category
-                </button> -->
+                Create Warehouse
+                </button>
             </div>
         </div>
     <div class="bg-white border rounded">
@@ -68,7 +68,7 @@
         <template #actions="{ row }">
           <button
             v-if="auth.can('warehouse.update')"
-
+            @click="openEdit(row)"
             class="text-indigo-600 hover:underline mr-3"
           >
             <Edit :size="16" />
@@ -110,23 +110,44 @@
         </template>
       </DataTable>
       </div>
-
+      <CreateWarehouseModal
+        v-model="showCreateModal"
+        @created="loadWarehouse"
+      />
+    <EditWarehouseModal
+      v-model="showEditModal"
+      :warehouse="selectedWarehouse"
+      @updated="loadWarehouse"
+    />
     </div>
     </div>
 </template>
 <script setup lang="ts">
 import { ref,watch } from "vue";
 import DataTable from "@/shared/components/DataTable.vue";
+import CreateWarehouseModal from "../components/CreateWarehouseModal.vue";
+import EditWarehouseModal from "../components/EditWarehouseModal.vue";
 import { useWarehouse } from "../composables/useWarehouse";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 import {
   Edit,
   Trash2
 } from "lucide-vue-next";
+import type { Warehouse } from "@/types/warehouse";
+const selectedWarehouse = ref<Warehouse | null>(null);
+const showCreateModal = ref(false);
+const showEditModal = ref(false);
 const auth = useAuthStore();
 const search = ref("")
 const statusFilter = ref<"all" | "active" | "inactive">("all")
 const { warehouse, loading, currentPage, lastPage, loadWarehouse } = useWarehouse();
+const openEdit = (warehouse: Warehouse) => {
+  selectedWarehouse.value = warehouse;
+  showEditModal.value = true;
+};
+watch([search, statusFilter], () => {
+  loadWarehouse(1, search.value, statusFilter.value)
+})
 const columns = [
   { key: "index", label: "#" },
   { key: "name", label: "Warehouse Name" },
@@ -136,9 +157,11 @@ const columns = [
   { key: "contact_phone", label: "Phone No." },
   { key: "contact_email", label: "Email" },
 //   { key: "description", label: "Description" },
+{ key: "is_active", label: "Status" },
   { key: "created_at_formatted", label: "Created Date" },
   { key: "updated_at_formatted", label: "Updated Date" },
 ];
+
 
 
 </script>
