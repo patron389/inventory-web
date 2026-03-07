@@ -57,6 +57,28 @@
         </RouterLink>
       </div>
 
+      <div class="stock py-4 border-b">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Stock Management</p>
+        <RouterLink
+          v-if="auth.can('stock.view')"
+          to="/stock"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <Layers class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">Manage Stock</span>
+        </RouterLink>
+      </div>
+      <div class="stock py-4 border-b">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Warehouse Management</p>
+        <RouterLink
+          v-if="auth.can('warehouse.view')"
+          to="/warehouses"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <Store class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">Warehouses</span>
+        </RouterLink>
+      </div>
       <div class="users py-4">
         <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">User Management</p>
         <RouterLink
@@ -78,7 +100,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-import { Sparkle, Users, Box, LayoutGrid, ListOrdered, } from "lucide-vue-next";
+import { Sparkle, Users, Box, LayoutGrid, ListOrdered, Layers, Store } from "lucide-vue-next";
 
 defineProps<{
   collapsed: boolean;

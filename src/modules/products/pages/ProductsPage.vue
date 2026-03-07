@@ -54,6 +54,9 @@
         :columns="columns"
         :loading="loading"
       >
+        <template #cell-index="{ index }">
+          {{ (currentPage - 1) * 10 + index + 1 }}
+        </template>
         <template #cell-is_active="{ row }">
           <span   :class="[
                   'px-3 py-2 text-xs font-medium rounded-md',
@@ -193,6 +196,7 @@ const { products, loading, currentPage, lastPage, loadProducts } = useProducts()
  * label → table header text
  */
 const columns = [
+  { key: "index", label: "#" },
   { key: "name", label: "Product Name" },
   { key: "category", label: "Category" },
   { key: "brand", label: "Brand" },

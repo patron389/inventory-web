@@ -4,6 +4,7 @@ import DashboardPage from "@/modules/dashboard/pages/DashboardPage.vue";
 import ProductsPage from "@/modules/products/pages/ProductsPage.vue";
 import BrandsPage from "@/modules/brands/pages/BrandsPage.vue";
 import CategoryPage from "@/modules/category/pages/CategoryPage.vue";
+import WarehousePage from "@/modules/warehouse/pages/WarehousePage.vue";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const routes = [
@@ -49,6 +50,11 @@ const routes = [
         path: "categories",
         name: "categories",
         component: CategoryPage,
+      },
+      {
+        path: "warehouses",
+        name: "warehouse",
+        component: WarehousePage,
       },
     ],
   },

@@ -64,7 +64,7 @@
       </thead>
 
       <tbody class="bg-white divide-y divide-gray-200">
-        <tr v-for="row in rows" :key="row[idKey]">
+        <tr v-for="(row, index) in rows" :key="row[idKey]">
 
           <!-- Normal cells -->
           <td
@@ -76,6 +76,7 @@
             <slot
               :name="`cell-${col.key}`"
               :row="row"
+              :index="index" 
             >
               {{ row[col.key] }}
             </slot>

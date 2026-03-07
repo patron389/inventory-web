@@ -55,6 +55,9 @@
         :loading="loading"
       >
         <!-- Custom Status Column -->
+        <template #cell-index="{ index }">
+          {{ (currentPage - 1) * 10 + index + 1 }}
+        </template>
         <template #cell-name="{ row }">
           <div class="flex items-center gap-3">
             <img
@@ -183,6 +186,7 @@ const openEdit = (brand: Brand) => {
 const { brands, loading, currentPage, lastPage, loadBrands } = useBrands();
 
 const columns = [
+  { key: "index", label: "#" },
   { key: "name", label: "Brand Name" },
   { key: "created_at_formatted", label: "Created Date" },
   { key: "updated_at_formatted", label: "Updated Date" },
