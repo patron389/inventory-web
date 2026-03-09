@@ -18,6 +18,7 @@
       Emits update:modelValue on change.
     -->
     <input
+      v-bind="$attrs"
       :type="type"
       :value="modelValue"
       @input="updateValue"

@@ -54,7 +54,7 @@ title="Edit Brand"
           :disabled="loading"
           class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
-          {{ loading ? "Update..." : "Update" }}
+          {{ loading ? "Updating..." : "Update" }}
         </button>
       </div>
     </template>

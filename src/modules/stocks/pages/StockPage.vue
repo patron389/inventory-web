@@ -75,12 +75,12 @@
             </div>
 
             <span>
-              {{ row.brand?.name ?? "N/A" }}
+              {{ row.brand_name ?? "N/A" }}
             </span>
           </div>
         </template>
         <!-- Actions Column -->
-        <template #actions="{ row }">
+        <!-- <template #actions="{ row }">
           <button
             v-if="auth.can('category.update')"
 
@@ -95,7 +95,7 @@
           >
             <Trash2 :size="16" />
           </button>
-        </template>
+        </template> -->
         <template #pagination>
           <div class="flex justify-between items-center">
 
@@ -140,7 +140,7 @@ import { useStocks } from "../composables/useStocks";
 import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
 import type { Warehouse } from "@/types/warehouse"
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-import AdjustStockModal from "../components/AdjustStock.vue";
+import AdjustStockModal from "../components/AdjustStockModal.vue";
 import SearchSelect from "@/shared/components/form/SearchSelect.vue";
 import type { Stock } from "@/types/stock";
 import {
@@ -173,6 +173,6 @@ const columns = [
   { key: "product_name", label: "Product Name" },
   { key: "category", label: "Category" },
   { key: "brand", label: "Brand" },
-  { key: "quantity", label: "QTY" },
+  { key: "quantity", label: "Stocks" },
 ];
 </script>

@@ -15,3 +15,10 @@ export function fetchStocks(
     }
   })
 }
+export const addStock = (data: any) => {
+  return api.post("/stocks/add", data)
+}
+
+export const deductStock = (data: any) => {
+  return api.post("/stocks/deduct", data)
+}
