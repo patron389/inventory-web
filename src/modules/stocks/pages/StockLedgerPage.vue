@@ -1,0 +1,181 @@
+<template>
+  <div class="space-y-6">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-semibold">Stock Ledger</h1>
+        <p class="text-base text-neutral-500 mt-2">View your stock movements</p>
+      </div>
+
+      <!-- Create button (permission aware) -->
+       <div class="flex gap-3">
+        <button
+          @click="() => loadStockLedger()"
+          class="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
+        >
+          Refresh
+        </button>
+        <button
+          v-if="auth.can('stock.add')"
+          @click="ShowAdjustModal = true"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Adjust Stock
+        </button>
+       </div>
+    </div>
+    <div class="bg-white border rounded">
+      <div class="border-b">
+        <div class="flex justify-between text-sm p-5">
+          <!-- Search -->
+          <input
+            v-model="search"
+            type="text"
+            placeholder="Search product..."
+            class="border rounded px-3 py-2 w-64"
+          />
+          <!-- Status Filter -->
+        <!-- <select
+          v-model="warehouse"
+          class="border rounded px-3 py-2"
+        >
+          <option
+            v-for="wh in warehouses"
+            :key="wh.id"
+            :value="wh.id"
+          >
+            {{ wh.name }}
+          </option>
+        </select> -->
+        </div>
+      </div>
+      <div class="p-5">
+      <DataTable
+        :rows="stock"
+        :columns="columns"
+        :loading="loading"
+      >
+        <template #cell-index="{ index }">
+          {{ (currentPage - 1) * 10 + index + 1 }}
+        </template>
+        <template #cell-brand="{ row }">
+          <div class="flex items-center gap-3">
+            <img
+              v-if="row.brand_image"
+              :src="row.brand_image"
+              alt="brand image"
+              class="w-10  object-contain rounded-md border"
+            />
+
+            <!-- Fallback if no image -->
+            <div
+              v-else
+              class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md border text-gray-400 text-xs"
+            >
+              N/A
+            </div>
+
+            <span>
+              {{ row.brand_name ?? "N/A" }}
+            </span>
+          </div>
+        </template>
+        <!-- Actions Column -->
+        <!-- <template #actions="{ row }">
+          <button
+            v-if="auth.can('category.update')"
+
+            class="text-indigo-600 hover:underline mr-3"
+          >
+            <Edit :size="16" />
+          </button>
+
+          <button
+            v-if="auth.can('user.delete')"
+            class="text-red-600 hover:underline"
+          >
+            <Trash2 :size="16" />
+          </button>
+        </template> -->
+        <template #pagination>
+          <div class="flex justify-between items-center">
+
+            <span class="text-sm text-gray-600">
+              Page {{ currentPage }} of {{ lastPage }}
+            </span>
+
+            <div class="space-x-2">
+              <button
+                :disabled="currentPage === 1"
+                @click="loadStockLedger(currentPage - 1)"
+                class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              <button
+                :disabled="currentPage === lastPage"
+                @click="loadStockLedger(currentPage + 1)"
+                class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+
+          </div>
+        </template>
+      </DataTable>
+      </div>
+
+    </div>
+  </div>
+    <AdjustStockModal
+    v-model="ShowAdjustModal"
+    @created="loadStockLedger"
+  />
+</template>
+<script setup lang="ts">
+import { ref,watch, onMounted } from "vue";
+import DataTable from "@/shared/components/DataTable.vue";
+import { useStockLedger } from "../composables/useStocks";
+import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
+import type { Warehouse } from "@/types/warehouse"
+import { useAuthStore } from "@/modules/auth/store/auth.store";
+import AdjustStockModal from "../components/AdjustStockModal.vue";
+import SearchSelect from "@/shared/components/form/SearchSelect.vue";
+import type { Stock } from "@/types/stock";
+import {
+  Edit,
+  Trash2
+} from "lucide-vue-next";
+const auth = useAuthStore();
+const ShowAdjustModal = ref(false);
+const search = ref("")
+// const warehouse = ref<number>(1)
+// const warehouses = ref<Warehouse[]>([])
+  // Load warehouse list for filter dropdown
+// const loadWarehouses = async () => {
+//   const res = await fetchWarehouse()
+
+//   // Paginated response → warehouses are inside data.data
+//   warehouses.value = res.data.data
+// }
+
+// onMounted(() => {
+//   loadWarehouses()
+// })
+
+watch([search], () => {
+  loadStockLedger(1, search.value)
+})
+const { stock, loading, currentPage, lastPage, loadStockLedger } = useStockLedger();
+const columns = [
+  { key: "index", label: "#" },
+  { key: "warehouse", label: "Warehouse" },
+  { key: "product", label: "Product" },
+  { key: "sku", label: "Sku" },
+  { key: "type", label: "Type" },
+  { key: "quantity", label: "QTY" },
+  { key: "reference", label: "Reference" },
+  { key: "performed_by", label: "Person" },
+];
+</script>

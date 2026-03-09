@@ -15,6 +15,17 @@ export function fetchStocks(
     }
   })
 }
+export function fetchStockLedger(
+  page = 1,
+  search = "",
+) {
+  return api.get<Paginated<Stock>>(`/stock-movements`,{
+    params: {
+      page,
+      search,
+    }
+  })
+}
 export const addStock = (data: any) => {
   return api.post("/stocks/add", data)
 }

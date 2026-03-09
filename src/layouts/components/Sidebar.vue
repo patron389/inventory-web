@@ -77,7 +77,7 @@
         </RouterLink>
         <RouterLink
           v-if="auth.can('stock.view')"
-          to="/warehouses"
+          to="/stock-ledger"
           class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
         >
           <NotebookText class="w-4 h-4 text-gray-600" />

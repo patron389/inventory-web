@@ -6,6 +6,7 @@ import BrandsPage from "@/modules/brands/pages/BrandsPage.vue";
 import CategoryPage from "@/modules/category/pages/CategoryPage.vue";
 import WarehousePage from "@/modules/warehouse/pages/WarehousePage.vue";
 import StockPage from "@/modules/stocks/pages/StockPage.vue";
+import StockLedgerPage from "@/modules/stocks/pages/StockLedgerPage.vue";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const routes = [
@@ -61,6 +62,11 @@ const routes = [
         path: "stocks",
         name: "stock",
         component: StockPage,
+      },
+      {
+        path: "stock-ledger",
+        name: "stock-ledger",
+        component: StockLedgerPage,
       },
     ],
   },
