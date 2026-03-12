@@ -69,11 +69,11 @@
         </RouterLink>
         <RouterLink
           v-if="auth.can('stock.view')"
-          to="/warehouses"
+          to="/stock-transfer"
           class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
         >
           <FolderSymlink class="w-4 h-4 text-gray-600" />
-          <span v-if="!collapsed">Transfer Stock</span>
+          <span v-if="!collapsed">Stock Transfer</span>
         </RouterLink>
         <RouterLink
           v-if="auth.can('stock.view')"

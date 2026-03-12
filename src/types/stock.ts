@@ -17,3 +17,12 @@ export interface StockLedger {
     reference: number,
     performed_by: string,
 }
+export interface StockTransfer {
+    id:number,
+    from_warehouse_name: string,
+    to_warehouse_name: string,
+    product_name: string,
+    user_name: string,
+    quantity: number,
+    status: string,
+}

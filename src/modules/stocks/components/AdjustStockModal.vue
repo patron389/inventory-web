@@ -14,15 +14,15 @@
         placeholder="Select Warehouse"
         :reduce="(b) => b.id"
         />
-        <SearchSelect
-          v-model="form.product_id"
-          :options="stock"
-          label="Product"
-          optionLabel="product_name"
-          placeholder="Select Product"
-          :reduce="(c) => c.product_id"
-          :disabled="!form.warehouse_id"
-        />
+      <SearchSelect
+        v-model="form.product_id"
+        :options="products"
+        label="Product"
+        optionLabel="name"
+        placeholder="Select Product"
+        :reduce="(p) => p.id"
+        :disabled="!form.warehouse_id"
+      />
       <div class="grid grid-cols-2 gap-6">
 
         <FormInput
@@ -58,10 +58,10 @@
 
         <button
           @click="submit"
-          :disabled="loading"
+          :disabled="submitting"
           class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
-          {{ loading ? "Submitting..." : "Submit" }}
+          {{ submitting ? "Submitting..." : "Submit" }}
         </button>
       </div>
     </template>
@@ -77,6 +77,9 @@ import FormInput from "@/shared/components/form/FormInput.vue";
 import type { Warehouse } from "@/types/warehouse"
 import {addStock, deductStock} from "../api/stock.api";
 import { useToastStore } from "@/shared/stores/toast.store";
+import { fetchProducts } from "@/modules/products/api/products.api";
+import type { Product } from "@/types/product.type"
+const submitting = ref(false)
 const toast = useToastStore();
 const emit = defineEmits([
   "update:modelValue",
@@ -88,7 +91,14 @@ const adjustmentTypes = [
 ]
 const errors = ref<Record<string, string[]>>({});
 const warehouses = ref<Warehouse[]>([])
+const products = ref<Product[]>([])
 
+const loadProducts = async () => {
+  const res = await fetchProducts()
+
+  // Products are inside paginated response
+  products.value = res.data.data
+}
   // Load warehouse list for filter dropdown
 const loadWarehouses = async () => {
   const res = await fetchWarehouse()
@@ -98,8 +108,8 @@ const loadWarehouses = async () => {
 }
 onMounted(() => {
   loadWarehouses()
+  loadProducts()
 })
-
 
 
 const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
@@ -114,27 +124,37 @@ const form = reactive({
   adjustment_type: "" as "add" | "deduct" | "",
   adjustment_quantity: "" as number | ""
 });
-watch(() => form.warehouse_id, (warehouseId) => {
+
+watch(() => form.warehouse_id, async (warehouseId) => {
+
+  // Reset dependent fields when warehouse changes
   form.product_id = ""
   form.quantity = ""
-  if (warehouseId) {
-    loadStocks(1, "", warehouseId)
-    
-  }
-})
 
+  // Load stock list for this warehouse
+  if (warehouseId) {
+    await loadStocks(1, "", warehouseId)
+  }
+
+})
 watch(() => form.product_id, (productId) => {
+
+  if (!productId) {
+    form.quantity = ""
+    return
+  }
+
+  // Find existing stock record
   const selectedStock = stock.value.find(
     s => s.product_id === productId
   )
 
-  if (selectedStock) {
-    form.quantity = selectedStock.quantity
-  }
-})
+  // If stock doesn't exist yet → quantity = 0
+  form.quantity = selectedStock ? selectedStock.quantity : 0
 
+})
 const submit = async () => {
-  loading.value = true;
+  submitting.value = true;
   errors.value = {}; // reset previous errors
 
   try {
@@ -182,7 +202,7 @@ const submit = async () => {
     }
 
   } finally {
-    loading.value = false;
+    submitting.value = false  ;
   }
 };
 </script>
