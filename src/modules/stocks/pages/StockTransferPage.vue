@@ -89,10 +89,10 @@
 
     </div>
   </div>
-    <!-- <AdjustStockModal
+    <StockTransferModal
     v-model="ShowAdjustModal"
     @created="loadStockTransfer"
-  /> -->
+  />
 </template>
 <script setup lang="ts">
 import { ref,watch, onMounted } from "vue";
@@ -101,7 +101,7 @@ import { useStockTransfer } from "../composables/useStocks";
 import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
 import type { Warehouse } from "@/types/warehouse"
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-import AdjustStockModal from "../components/AdjustStockModal.vue";
+import StockTransferModal from "../components/StockTransferModal.vue";
 import SearchSelect from "@/shared/components/form/SearchSelect.vue";
 import type { Stock } from "@/types/stock";
 import {
@@ -133,9 +133,8 @@ const columns = [
   { key: "index", label: "#" },
   { key: "from_warehouse_name", label: "From Warehouse" },
   { key: "to_warehouse_name", label: "To Warehouse" },
-  { key: "product_name", label: "Products" },
+  { key: "items_count", label: "Items" },
   { key: "user_name", label: "Person" },
-  { key: "quantity", label: "QTY" },
   { key: "status", label: "Status" },
   { key: "created_at_formatted", label: "Date Transfer" },
   // { key: "created_time", label: "Time" },

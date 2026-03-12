@@ -141,7 +141,6 @@ import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
 import type { Warehouse } from "@/types/warehouse"
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 import AdjustStockModal from "../components/AdjustStockModal.vue";
-import SearchSelect from "@/shared/components/form/SearchSelect.vue";
 import type { Stock } from "@/types/stock";
 import {
   Edit,

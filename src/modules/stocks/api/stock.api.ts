@@ -47,3 +47,7 @@ export const addStock = (data: any) => {
 export const deductStock = (data: any) => {
   return api.post("/stocks/deduct", data)
 }
+
+export const createTransfer = (data: any) => {
+  return api.post("/transfers", data)
+}
