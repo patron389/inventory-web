@@ -23,14 +23,7 @@
         :reduce="(p) => p.id"
         :disabled="!form.warehouse_id"
       />
-      <div class="grid grid-cols-2 gap-6">
-
-        <FormInput
-        v-model="form.quantity"
-        label="Current quantity"
-        :error="errors.quantity"
-        readonly
-        />
+      <div class="grid grid-cols-[1.2fr,.4fr,.4fr] gap-6">
       <SearchSelect
         v-model="form.adjustment_type"
         :options="adjustmentTypes"
@@ -39,13 +32,21 @@
         placeholder="Select Type"
         :reduce="(t) => t.value"
       />
-      </div>
+        <FormInput
+        v-model="form.quantity"
+        label="Cur. Qty"
+        :error="errors.quantity"
+        readonly
+        />
+
       <FormInput
         v-model="form.adjustment_quantity"
-        label="Adjustment Quantity"
+        label="Adj. Qty"
         :error="errors.adjustment_quantity"
         type="number"
       />
+      </div>
+
     </div>
         <template #footer>
       <div class="flex justify-end gap-3">
@@ -68,7 +69,7 @@
     </FormModal>
 </template>
 <script setup lang="ts">
-import { reactive, ref, onMounted, watch } from "vue";
+import { reactive, ref, onMounted, watch, computed } from "vue";
 import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
 import FormModal from "@/shared/components/form/FormModal.vue";
 import { useStocks } from "../composables/useStocks";
@@ -92,6 +93,7 @@ const adjustmentTypes = [
 const errors = ref<Record<string, string[]>>({});
 const warehouses = ref<Warehouse[]>([])
 const products = ref<Product[]>([])
+
 
 const loadProducts = async () => {
   const res = await fetchProducts()
@@ -117,6 +119,7 @@ const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
 defineProps<{
   modelValue: boolean;
 }>();
+
 const form = reactive({
   warehouse_id: "" as number | "",
   product_id: "" as number | "",
@@ -137,6 +140,7 @@ watch(() => form.warehouse_id, async (warehouseId) => {
   }
 
 })
+
 watch(() => form.product_id, (productId) => {
 
   if (!productId) {
@@ -153,6 +157,8 @@ watch(() => form.product_id, (productId) => {
   form.quantity = selectedStock ? selectedStock.quantity : 0
 
 })
+
+
 const submit = async () => {
   submitting.value = true;
   errors.value = {}; // reset previous errors

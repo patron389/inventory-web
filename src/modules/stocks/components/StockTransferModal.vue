@@ -4,9 +4,8 @@
         @update:modelValue="$emit('update:modelValue', $event)"
         title="Stock Transfer"
     >
-<div class="space-y-4">
+<div class="space-y-4 max-h-[50vh]">
   <!-- Warehouses -->
-
     <SearchSelect
       v-model="form.from_warehouse_id"
       :options="warehouses"
@@ -18,7 +17,7 @@
 
     <SearchSelect
       v-model="form.to_warehouse_id"
-      :options="warehouses"
+      :options="warehouses.filter(w => w.id !== form.from_warehouse_id)"
       label="To Warehouse"
       optionLabel="name"
       placeholder="Select Destination Warehouse"
@@ -29,26 +28,21 @@
   <div
     v-for="(item, index) in form.items"
     :key="index"
-    class="grid grid-cols-2 gap-4 items-end"
+    class="grid grid-cols-[1.3fr_0.3fr_0.3fr_0.1fr] gap-4 items-center"
   >
 
     <SearchSelect
-    class="col-span-2"
       v-model="item.product_id"
-      :options="form.from_warehouse_id ? availableProducts : []"
-      label="Select Product"
+      :options="form.from_warehouse_id ? filteredProducts(item.product_id) : []"
+      :label="`Select Product ${index + 1}`"
       optionLabel="product_name"
       placeholder="Select Product"
       :reduce="(p) => p.product_id"
       :disabled="!form.from_warehouse_id"
+      appendTo="body"
       @update:modelValue="updateStock(item)"
-    >
-    <template #option="{ option }">
-      <div class="px-3 py-2 hover:bg-gray-100">
-        {{ option.product_name }} ({{ option.quantity }})
-      </div>
-    </template>
-    </SearchSelect>
+    />
+
 
     <FormInput
       v-model="item.current_stock"
@@ -67,14 +61,15 @@
     <button
       v-if="form.items.length > 1"
       @click="removeItem(index)"
-      class="text-red-500 text-sm"
+      class="text-red-500"
     >
-      Remove
+      <Trash2 :size="18" />
     </button>
 
   </div>
 
   <button
+    v-if="canAddItem"
     @click="addItem"
     class="text-blue-600 text-sm"
   >
@@ -115,22 +110,27 @@ import FormModal from "@/shared/components/form/FormModal.vue";
 import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
 import type { Warehouse } from "@/types/warehouse"
 import { useToastStore } from "@/shared/stores/toast.store";
-import type { Product } from "@/types/product.type"
-import { fetchProducts } from "@/modules/products/api/products.api";
+import {
+  Edit,
+  Trash2
+} from "lucide-vue-next";
 const toast = useToastStore();
+
 const submitting = ref(false)
+
 const warehouses = ref<Warehouse[]>([])
+
 const errors = ref<Record<string, string[]>>({});
+
+const canAddItem = computed(() => {
+  return !!form.from_warehouse_id && form.items.length < stock.value.length
+})
+
 const loadWarehouses = async () => {
   const res = await fetchWarehouse()
 
   // Paginated response → warehouses are inside data.data
   warehouses.value = res.data.data
-}
-const products = ref<Product[]>([])
-const loadProducts = async () => {
-  const res = await fetchProducts()
-  products.value = res.data.data
 }
 const emit = defineEmits([
   "update:modelValue",
@@ -155,10 +155,13 @@ const form = reactive({
 });
 
 
-const availableProducts = computed(() => {
-  return stock.value
-})
+const filteredProducts = (currentProductId: number | "") => {
+  const selectedIds = form.items
+    .map(i => i.product_id)
+    .filter(id => id && id !== currentProductId)
 
+  return stock.value.filter(p => !selectedIds.includes(p.product_id))
+}
 const addItem = () => {
   form.items.push({
     product_id: "",
@@ -170,15 +173,18 @@ const addItem = () => {
 const removeItem = (index: number) => {
   form.items.splice(index, 1);
 };
-const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
+const { stock, loadStocks } = useStocks();
 
 watch(() => form.from_warehouse_id, async (warehouseId) => {
 
-  form.items.forEach(item => {
-    item.product_id = ""
-    item.current_stock = 0
-    item.quantity = ""
-  })
+  // reset items
+  form.items = [
+    {
+      product_id: "",
+      current_stock: 0,
+      quantity: ""
+    }
+  ]
 
   if (warehouseId) {
     await loadStocks(1, "", warehouseId)
@@ -197,7 +203,6 @@ const updateStock = (item:any) => {
 }
 onMounted(() => {
   loadWarehouses()
-  loadProducts()
 })
 
 

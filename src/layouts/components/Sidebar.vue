@@ -65,7 +65,7 @@
           class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
         >
           <LayersPlus class="w-4 h-4 text-gray-600" />
-          <span v-if="!collapsed">Stock Adjustments</span>
+          <span v-if="!collapsed">Stocks</span>
         </RouterLink>
         <RouterLink
           v-if="auth.can('stock.view')"
@@ -95,7 +95,7 @@
           <span v-if="!collapsed">Warehouses</span>
         </RouterLink>
       </div>
-      <div class="users py-4">
+      <div v-if="auth.can('user.view')" class="users py-4">
         <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">User Management</p>
         <RouterLink
           v-if="auth.can('user.view')"

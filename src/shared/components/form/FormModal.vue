@@ -4,7 +4,7 @@
     v-if="modelValue"
     class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
   >
-    <div class="bg-white w-full max-w-lg rounded shadow p-6 space-y-4">
+    <div class="bg-white w-full max-w-xl rounded shadow p-6 space-y-4 flex flex-col">
 
       <!-- Header -->
       <div class="flex justify-between items-center">
@@ -22,7 +22,7 @@
       </div>
 
       <!-- Body slot -->
-      <div>
+      <div class="overflow-y-auto flex-1">
         <slot />
       </div>
 

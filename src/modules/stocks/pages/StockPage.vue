@@ -9,7 +9,7 @@
       <!-- Create button (permission aware) -->
        <div class="flex gap-3">
         <button
-          @click="() => loadStocks()"
+          @click="refreshStocks"
           class="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
         >
           Refresh
@@ -33,19 +33,32 @@
             placeholder="Search product..."
             class="border rounded px-3 py-2 w-64"
           />
+
           <!-- Status Filter -->
-        <select
-          v-model="warehouse"
-          class="border rounded px-3 py-2"
-        >
-          <option
-            v-for="wh in warehouses"
-            :key="wh.id"
-            :value="wh.id"
-          >
-            {{ wh.name }}
-          </option>
-        </select>
+           <div class="flex items-center gap-3">
+            <select
+              v-model="warehouse"
+              class="border rounded px-3 py-2"
+            >
+              <option
+                v-for="wh in warehouses"
+                :key="wh.id"
+                :value="wh.id"
+              >
+                {{ wh.name }}
+              </option>
+            </select>
+            <select
+              v-model="status"
+              class="border rounded px-3 py-2"
+            >
+              <option value="">All Status</option>
+              <option value="low">Low</option>
+              <option value="mid">Mid</option>
+              <option value="high">High</option>
+            </select>
+           </div>
+
         </div>
       </div>
       <div class="p-5">
@@ -96,6 +109,14 @@
             <Trash2 :size="16" />
           </button>
         </template> -->
+      <template #cell-stock_status="{ row }">
+        <span
+          class="px-3 py-1 text-xs font-semibold rounded-full"
+          :class="getStatusClass(row.stock_status)"
+        >
+          {{ row.stock_status }}
+        </span>
+      </template>
         <template #pagination>
           <div class="flex justify-between items-center">
 
@@ -149,8 +170,26 @@ import {
 const auth = useAuthStore();
 const ShowAdjustModal = ref(false);
 const search = ref("")
-const warehouse = ref<number>(1)
+const warehouse = ref<number>(2)
 const warehouses = ref<Warehouse[]>([])
+const status = ref("")
+const refreshStocks = () => {
+  loadStocks(1, search.value, warehouse.value, status.value)
+};
+// Status style 
+const getStatusClass = (status: string) => {
+  switch (status) {
+    case "Low":
+      return "bg-red-100 text-red-700";
+    case "Mid":
+      return "bg-yellow-100 text-yellow-700";
+    case "High":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-gray-100 text-gray-600";
+  }
+};
+
   // Load warehouse list for filter dropdown
 const loadWarehouses = async () => {
   const res = await fetchWarehouse()
@@ -163,8 +202,8 @@ onMounted(() => {
   loadWarehouses()
 })
 
-watch([search, warehouse], () => {
-  loadStocks(1, search.value, warehouse.value)
+watch([search, warehouse, status], () => {
+  loadStocks(1, search.value, warehouse.value, status.value)
 })
 const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
 const columns = [
@@ -173,5 +212,6 @@ const columns = [
   { key: "category", label: "Category" },
   { key: "brand", label: "Brand" },
   { key: "quantity", label: "Stocks" },
+  { key: "stock_status", label: "Status" },
 ];
 </script>

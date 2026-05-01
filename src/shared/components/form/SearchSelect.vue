@@ -15,8 +15,11 @@
       :reduce="reduce"
       :label="optionLabel"
       :placeholder="placeholder"
+      append-to-body
       class="w-full"
-    />
+    >
+    
+    </v-select>
 
     <p
       v-if="error"
@@ -50,6 +53,7 @@ const emit = defineEmits(["update:modelValue"])
   padding: 6px 8px;
   border: 1px solid #d1d5db;
 }
+
 .vs__open-indicator {
   transform: scale(0.8);
 }
@@ -57,7 +61,42 @@ const emit = defineEmits(["update:modelValue"])
 .vs--open .vs__open-indicator {
   transform: rotate(180deg) scale(0.8);
 }
+
 .vs__clear {
   transform: scale(0.8);
+}
+
+.vs__dropdown-menu {
+  z-index: 9999;
+}
+
+/* dropdown items */
+.vs__dropdown-option {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+/* container holding selected text */
+.vs__selected-options {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* selected value */
+.vs__selected {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  max-width: 80%;
+}
+
+.vs__selected {
+  cursor: default;
 }
 </style>

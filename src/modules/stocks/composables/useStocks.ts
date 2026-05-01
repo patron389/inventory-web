@@ -14,18 +14,17 @@ export function useStocks() {
   const loadStocks = async (  
     page = 1,
     searchQuery = "",
-    warehouse: number = 1
+    warehouse?: number,
+    status = ""
   ) => {
     loading.value = true;
     error.value = null;
 
     try {
-      const response = await fetchStocks(page, searchQuery, warehouse);
+      const response = await fetchStocks(page, searchQuery, warehouse, status);
 
       // Normalize here
-      stock.value = response.data.data.map((stock: any) => ({
-        ...stock,
-      }));
+      stock.value = response.data.data;
 
       currentPage.value = response.data.meta.current_page;
       lastPage.value = response.data.meta.last_page;
@@ -40,7 +39,7 @@ export function useStocks() {
   };
 
   onMounted(() => {
-    loadStocks();
+    loadStocks(1, "", 2, "");
   });
 
   return {
