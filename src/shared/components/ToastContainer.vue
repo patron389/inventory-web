@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-5 right-5 space-y-3 z-50">
+  <div class="fixed top-5 right-5 space-y-3 z-[9999]">
 
     <TransitionGroup
       name="toast"

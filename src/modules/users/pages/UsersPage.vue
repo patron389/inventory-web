@@ -189,6 +189,7 @@ const { users, loading, currentPage, lastPage, loadUsers } = useUsers();
 const columns = [
   { key: "first_name", label: "First Name" },
   { key: "last_name", label: "Last Name" },
+  { key: "role", label: "Role" },
   { key: "phone_no", label: "Phone no" },
   { key: "email", label: "Email" },
   { key: "is_active", label: "Status" },

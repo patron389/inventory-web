@@ -130,10 +130,10 @@ watch([search], () => {
 })
 const { transfer, loading, currentPage, lastPage, loadStockTransfer } = useStockTransfer();
 const columns = [
-  { key: "index", label: "#" },
+  { key: "transfer_number", label: "#" },
   { key: "from_warehouse_name", label: "From Warehouse" },
   { key: "to_warehouse_name", label: "To Warehouse" },
-  { key: "items_count", label: "Items" },
+  { key: "items_count", label: "Products" },
   { key: "user_name", label: "Person" },
   { key: "status", label: "Status" },
   { key: "created_at_formatted", label: "Date Transfer" },

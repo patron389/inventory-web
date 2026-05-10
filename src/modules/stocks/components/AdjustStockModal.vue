@@ -1,72 +1,92 @@
 <template>
-    <FormModal
-        :modelValue="modelValue"
-        @update:modelValue="$emit('update:modelValue', $event)"
-        title="Adjust Stock"
-    >
-    
-    <div class="space-y-4">
-        <SearchSelect
-        v-model="form.warehouse_id"
-        :options="warehouses"
-        label="Warehouse"
-        optionLabel="name"
-        placeholder="Select Warehouse"
-        :reduce="(b) => b.id"
-        />
-      <SearchSelect
-        v-model="form.product_id"
-        :options="products"
-        label="Product"
-        optionLabel="name"
-        placeholder="Select Product"
-        :reduce="(p) => p.id"
-        :disabled="!form.warehouse_id"
-      />
-      <div class="grid grid-cols-[1.2fr,.4fr,.4fr] gap-6">
-      <SearchSelect
-        v-model="form.adjustment_type"
-        :options="adjustmentTypes"
-        label="Adjustment Type"
-        optionLabel="label"
-        placeholder="Select Type"
-        :reduce="(t) => t.value"
-      />
-        <FormInput
-        v-model="form.quantity"
-        label="Cur. Qty"
-        :error="errors.quantity"
-        readonly
-        />
 
-      <FormInput
-        v-model="form.adjustment_quantity"
-        label="Adj. Qty"
-        :error="errors.adjustment_quantity"
-        type="number"
-      />
-      </div>
+  <FormModal
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
+      title="Adjust Stock"
+  >
+  <Transition name="fade" mode="out-in">
+    <div
+      v-if="modalLoading"
+      class="py-10 flex flex-col items-center justify-center gap-3"
+    >
+      <div
+        class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"
+      ></div>
+
+      <p class="text-sm text-gray-500">
+        Loading stock details...
+      </p>
+    </div>
+
+    <div v-else class="space-y-4">
+        <div class="space-y-4">
+            <SearchSelect
+            v-model="form.warehouse_id"
+            :options="warehouses"
+            label="Warehouse"
+            optionLabel="name"
+            placeholder="Select Warehouse"
+            :reduce="(b) => b.id"
+            />
+          <SearchSelect
+            v-model="form.product_id"
+            :options="products"
+            label="Product"
+            optionLabel="name"
+            placeholder="Select Product"
+            :reduce="(p) => p.id"
+            :disabled="!form.warehouse_id"
+          />
+          <div class="grid grid-cols-[1.2fr,.4fr,.4fr] gap-6">
+          <SearchSelect
+            v-model="form.adjustment_type"
+            :options="adjustmentTypes"
+            label="Adjustment Type"
+            optionLabel="label"
+            placeholder="Select Type"
+            :reduce="(t) => t.value"
+          />
+            <FormInput
+            v-model="form.quantity"
+            label="Cur. Qty"
+
+            readonly
+            />
+
+          <FormInput
+            v-model="form.adjustment_quantity"
+            label="Adj. Qty"
+
+            type="number"
+          />
+          </div>
+
+        </div>
 
     </div>
-        <template #footer>
-      <div class="flex justify-end gap-3">
-        <button
-          @click="$emit('update:modelValue', false)"
-          class="px-4 py-2 bg-gray-200 rounded"
-        >
-          Cancel
-        </button>
+  </Transition>
 
-        <button
-          @click="submit"
-          :disabled="submitting"
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-        >
-          {{ submitting ? "Submitting..." : "Submit" }}
-        </button>
-      </div>
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <button
+            @click="$emit('update:modelValue', false)"
+            class="px-4 py-2 bg-gray-200 rounded"
+          >
+            Cancel
+          </button>
+
+          <button
+            @click="submit"
+            :disabled="submitting"
+            class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          >
+            {{ submitting ? "Submitting..." : "Submit" }}
+          </button>
+        </div>
     </template>
-    </FormModal>
+    
+  </FormModal>
 </template>
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch, computed } from "vue";
@@ -86,6 +106,7 @@ const emit = defineEmits([
   "update:modelValue",
   "created"
 ]);
+const modalLoading = ref(false)
 const adjustmentTypes = [
   { label: "Add Stock", value: "add" },
   { label: "Deduct Stock", value: "deduct" }
@@ -93,6 +114,12 @@ const adjustmentTypes = [
 const errors = ref<Record<string, string[]>>({});
 const warehouses = ref<Warehouse[]>([])
 const products = ref<Product[]>([])
+
+
+const props = defineProps<{
+  modelValue: boolean;
+  stock?: any;
+}>();
 
 
 const loadProducts = async () => {
@@ -116,9 +143,6 @@ onMounted(() => {
 
 const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
 
-defineProps<{
-  modelValue: boolean;
-}>();
 
 const form = reactive({
   warehouse_id: "" as number | "",
@@ -128,47 +152,86 @@ const form = reactive({
   adjustment_quantity: "" as number | ""
 });
 
-watch(() => form.warehouse_id, async (warehouseId) => {
 
-  // Reset dependent fields when warehouse changes
-  form.product_id = ""
-  form.quantity = ""
 
-  // Load stock list for this warehouse
-  if (warehouseId) {
-    await loadStocks(1, "", warehouseId)
+watch(
+  () => props.stock,
+  async (newStock) => {
+
+    if (!newStock) return
+
+    modalLoading.value = true
+
+    try {
+
+      await loadStocks(1, "", newStock.warehouse_id)
+
+      form.warehouse_id = Number(newStock.warehouse_id)
+      form.product_id = Number(newStock.product_id)
+      form.quantity = Number(newStock.quantity)
+
+    } finally {
+      modalLoading.value = false
+    }
+
+  },
+  { immediate: true }
+)
+
+watch(
+  () => form.product_id,
+  (productId) => {
+
+    if (!productId) {
+      form.quantity = ""
+      return
+    }
+
+    const selectedStock = stock.value.find(
+      s => s.product_id === productId
+    )
+
+    form.quantity = selectedStock
+      ? selectedStock.quantity
+      : 0
+
   }
+)
 
-})
+const submit = async () => {
 
-watch(() => form.product_id, (productId) => {
+  errors.value = {};
 
-  if (!productId) {
-    form.quantity = ""
+  // Validation
+  if (!form.adjustment_quantity) {
+    errors.value.adjustment_quantity = [
+      "Adjustment quantity is required"
+    ]
+
+    toast.show(
+      "Adjustment quantity is required",
+      "error"
+    )
+
     return
   }
 
-  // Find existing stock record
-  const selectedStock = stock.value.find(
-    s => s.product_id === productId
-  )
+  if (!form.adjustment_type) {
+    errors.value.adjustment_type = [
+      "Please select adjustment type"
+    ]
 
-  // If stock doesn't exist yet → quantity = 0
-  form.quantity = selectedStock ? selectedStock.quantity : 0
+    toast.show(
+      "Please select adjustment type",
+      "error"
+    )
 
-})
+    return
+  }
 
-
-const submit = async () => {
   submitting.value = true;
-  errors.value = {}; // reset previous errors
 
   try {
-
-    if (!form.adjustment_type) {
-      errors.value.adjustment_type = ["Please select adjustment type"];
-      return;
-    }
 
     const payload = {
       warehouse_id: Number(form.warehouse_id),
@@ -177,19 +240,29 @@ const submit = async () => {
     };
 
     if (form.adjustment_type === "add") {
+
       await addStock(payload);
-      toast.show("Stock added successfully", "success");
+
+      toast.show(
+        "Stock added successfully",
+        "success"
+      );
     }
 
     if (form.adjustment_type === "deduct") {
+
       await deductStock(payload);
-      toast.show("Stock deducted successfully", "success");
+
+      toast.show(
+        "Stock deducted successfully",
+        "success"
+      );
     }
 
     emit("created");
     emit("update:modelValue", false);
 
-    // Reset form after success
+    // Reset form
     Object.assign(form, {
       warehouse_id: "",
       product_id: "",
@@ -200,15 +273,26 @@ const submit = async () => {
 
   } catch (error: any) {
 
-    // Laravel validation error
-    if (error.status === 422 && error.errors) {
-      errors.value = error.errors;
+    if (error.status === 422) {
+
+      if (error.errors) {
+        errors.value = error.errors;
+      }
+
+      toast.show(error.message, "error");
+
     } else {
-      toast.show("Unexpected server error", "error");
+
+      toast.show(
+        error.message || "Unexpected server error",
+        "error"
+      );
     }
 
   } finally {
-    submitting.value = false  ;
+
+    submitting.value = false;
+
   }
 };
 </script>

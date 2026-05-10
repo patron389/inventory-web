@@ -1,35 +1,49 @@
 <template>
-    <FormModal
-        :modelValue="modelValue"
-        @update:modelValue="$emit('update:modelValue', $event)"
-        title="Create Products"
+  <FormModal
+      :modelValue="modelValue"
+      @update:modelValue="$emit('update:modelValue', $event)"
+      title="Create Products"
+  >
+  <Transition name="fade" mode="out-in">
+    <div
+      v-if="modalLoading"
+      class="py-10 flex flex-col items-center justify-center gap-3"
     >
-    <div class="space-y-4">
+      <div
+        class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"
+      ></div>
+
+      <p class="text-sm text-gray-500">
+        Loading product details...
+      </p>
+    </div>
+
+    <div v-else class="space-y-4">
         <FormInput
           v-model="form.name"
           label="Product Name"
           :error="errors.name"
         />
-    <div class="grid grid-cols-2 gap-6">
-        <SearchSelect
-        v-model="form.category_id"
-        :options="categories"
-        label="Category"
-        optionLabel="name"
-        placeholder="Select a Category"
-        :reduce="(c) => c.id"
-        :error="errors.category_id"
-        />
-        <SearchSelect
-        v-model="form.brand_id"
-        :options="brands"
-        label="Brand"
-        optionLabel="name"
-        placeholder="Select a Brand"
-        :reduce="(b) => b.id"
-        :error="errors.brand_id"
-        />
-    </div>
+      <div class="grid grid-cols-2 gap-6">
+          <SearchSelect
+          v-model="form.category_id"
+          :options="categories"
+          label="Category"
+          optionLabel="name"
+          placeholder="Select a Category"
+          :reduce="(c) => c.id"
+          :error="errors.category_id"
+          />
+          <SearchSelect
+          v-model="form.brand_id"
+          :options="brands"
+          label="Brand"
+          optionLabel="name"
+          placeholder="Select a Brand"
+          :reduce="(b) => b.id"
+          :error="errors.brand_id"
+          />
+      </div>
         <!-- <FormInput
           v-model="form.sku"
           label="SKU"
@@ -66,45 +80,47 @@
         </p>
       </div>
 
-    <div class="grid grid-cols-2 gap-6">
-        <FormInput
-          v-model="form.price"
-          label="Price"
-          type="number"
-          :error="errors.price"
-        />
-        <FormInput
-          v-model="form.unit"
-          label="Unit"
-          :error="errors.unit"
-        />
-    </div>
+      <div class="grid grid-cols-2 gap-6">
+          <FormInput
+            v-model="form.price"
+            label="Price"
+            type="number"
+            :error="errors.price"
+          />
+          <FormInput
+            v-model="form.unit"
+            label="Unit"
+            :error="errors.unit"
+          />
+      </div>
       <FormTextArea
         v-model="form.description"
         label="Description"
         :error="errors.description"
       />
     </div>
-    <!-- Footer -->
-    <template #footer>
-      <div class="flex justify-end gap-3">
-        <button
-          @click="$emit('update:modelValue', false)"
-          class="px-4 py-2 bg-gray-200 rounded"
-        >
-          Cancel
-        </button>
+  </Transition>
 
-        <button
-          @click="submit"
-          :disabled="loading"
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-        >
-          {{ loading ? "Updating..." : "Update" }}
-        </button>
-      </div>
-    </template>
-    </FormModal>
+  <!-- Footer -->
+  <template #footer>
+    <div class="flex justify-end gap-3">
+      <button
+        @click="$emit('update:modelValue', false)"
+        class="px-4 py-2 bg-gray-200 rounded"
+      >
+        Cancel
+      </button>
+
+      <button
+        @click="submit"
+        :disabled="loading"
+        class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+      >
+        {{ loading ? "Updating..." : "Update" }}
+      </button>
+    </div>
+  </template>
+  </FormModal>
 </template>
 <script setup lang="ts">
 import type { Product } from "@/types/product.type";
@@ -152,7 +168,7 @@ const props = defineProps<{
   modelValue: boolean;
   product: Product | null;
 }>();
-
+const modalLoading = ref(false)
 const toast = useToastStore();
 
 const loading = ref(false);
@@ -193,16 +209,32 @@ const form = reactive({
 
 watch(
   () => props.product,
-  (p) => {
+  async (p) => {
+
     if (!p) return
-    form.name = p.name ?? ""
-    form.category_id = p.category_id ?? null
-    form.brand_id = p.brand_id ?? null
-    form.sku = p.sku ?? ""
-    form.unit = p.unit ?? ""
-    form.description = p.description ?? ""
-    form.price = p.price ?? null
-    form.is_active = Boolean(p.is_active)
+
+    modalLoading.value = true
+
+    try {
+
+      // optional fake delay for smoother UX
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      form.name = p.name ?? ""
+      form.category_id = p.category_id ?? null
+      form.brand_id = p.brand_id ?? null
+      form.sku = p.sku ?? ""
+      form.unit = p.unit ?? ""
+      form.description = p.description ?? ""
+      form.price = p.price ?? null
+      form.is_active = Boolean(p.is_active)
+
+    } finally {
+
+      modalLoading.value = false
+
+    }
+
   },
   { immediate: true }
 )

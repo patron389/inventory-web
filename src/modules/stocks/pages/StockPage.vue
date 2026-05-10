@@ -70,6 +70,7 @@
         <template #cell-index="{ index }">
           {{ (currentPage - 1) * 10 + index + 1 }}
         </template>
+        
         <template #cell-brand="{ row }">
           <div class="flex items-center gap-3">
             <img
@@ -92,23 +93,7 @@
             </span>
           </div>
         </template>
-        <!-- Actions Column -->
-        <!-- <template #actions="{ row }">
-          <button
-            v-if="auth.can('category.update')"
 
-            class="text-indigo-600 hover:underline mr-3"
-          >
-            <Edit :size="16" />
-          </button>
-
-          <button
-            v-if="auth.can('user.delete')"
-            class="text-red-600 hover:underline"
-          >
-            <Trash2 :size="16" />
-          </button>
-        </template> -->
       <template #cell-stock_status="{ row }">
         <span
           class="px-3 py-1 text-xs font-semibold rounded-full"
@@ -117,6 +102,17 @@
           {{ row.stock_status }}
         </span>
       </template>
+      <!-- ACTIONS  -->
+        <template #actions="{ row }">
+          <button
+            v-if="auth.can('product.update')"
+            @click="openAdjustModal(row)"
+            class="text-gray-600 border border-neutral-300 p-2 rounded-[3px] hover:bg-neutral-300  transition duration-300 ease-in-out"
+          >
+            <Edit :size="16" />
+          </button>
+        </template>
+
         <template #pagination>
           <div class="flex justify-between items-center">
 
@@ -150,9 +146,10 @@
     </div>
   </div>
     <AdjustStockModal
-    v-model="ShowAdjustModal"
-    @created="loadStocks"
-  />
+      v-model="ShowAdjustModal"
+      :stock="selectedStock"
+      @created="loadStocks"
+    />
 </template>
 <script setup lang="ts">
 import { ref,watch, onMounted } from "vue";
@@ -167,6 +164,9 @@ import {
   Edit,
   Trash2
 } from "lucide-vue-next";
+
+const selectedStock = ref<Stock | null>(null)
+
 const auth = useAuthStore();
 const ShowAdjustModal = ref(false);
 const search = ref("")
@@ -176,6 +176,12 @@ const status = ref("")
 const refreshStocks = () => {
   loadStocks(1, search.value, warehouse.value, status.value)
 };
+
+const openAdjustModal = (row: Stock) => {
+  selectedStock.value = row
+  ShowAdjustModal.value = true
+}
+
 // Status style 
 const getStatusClass = (status: string) => {
   switch (status) {
@@ -200,11 +206,20 @@ const loadWarehouses = async () => {
 
 onMounted(() => {
   loadWarehouses()
-})
-
-watch([search, warehouse, status], () => {
   loadStocks(1, search.value, warehouse.value, status.value)
 })
+
+let timeout: any;
+
+watch([search, warehouse, status], () => {
+  clearTimeout(timeout);
+
+  timeout = setTimeout(() => {
+    loadStocks(1, search.value, warehouse.value, status.value);
+  }, 400); // 400ms debounce
+});
+
+
 const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
 const columns = [
   { key: "index", label: "#" },

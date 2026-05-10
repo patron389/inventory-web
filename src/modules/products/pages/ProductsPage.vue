@@ -94,14 +94,14 @@
           <button
             v-if="auth.can('product.update')"
             @click="openEdit(row)"
-            class="text-indigo-600 hover:underline mr-3"
+            class="text-gray-600 border border-neutral-300 p-2 rounded-[3px] hover:bg-neutral-300  transition duration-300 ease-in-out mr-3"
           >
             <Edit :size="16" />
           </button>
 
           <button
             v-if="auth.can('product.delete')"
-            class="text-red-600 hover:underline"
+            class="text-gray-600 border border-neutral-300 p-2 rounded-[3px] hover:bg-neutral-300  transition duration-300 ease-in-out"
           >
             <Trash2 :size="16" />
           </button>
@@ -184,6 +184,7 @@ const openEdit = (product: Product) => {
   selectedProduct.value = product;
   showEditModal.value = true;
 };
+
 // Destructure state from composable
 // users  → actual user data
 // loading → loading state for API call
