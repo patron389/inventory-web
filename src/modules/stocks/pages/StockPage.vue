@@ -170,7 +170,7 @@ const selectedStock = ref<Stock | null>(null)
 const auth = useAuthStore();
 const ShowAdjustModal = ref(false);
 const search = ref("")
-const warehouse = ref<number>(2)
+const warehouse = ref<number>(1)
 const warehouses = ref<Warehouse[]>([])
 const status = ref("")
 const refreshStocks = () => {

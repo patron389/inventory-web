@@ -38,9 +38,9 @@ export function useStocks() {
     }
   };
 
-  onMounted(() => {
-    loadStocks(1, "", 2, "");
-  });
+  // onMounted(() => {
+  //   loadStocks();
+  // });
 
   return {
     stock,

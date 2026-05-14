@@ -26,8 +26,8 @@
        </div>
 
       <div class="products py-4 border-b"
-      v-if="auth.can('product.view')">
-        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Inventory</p>
+        v-if="auth.can('product.view')">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Product Management</p>
         <!-- PRODUCT  -->
         <RouterLink
           v-if="auth.can('product.view')"
@@ -54,6 +54,20 @@
         >
           <ListOrdered class="w-4 h-4 text-gray-600" />
           <span v-if="!collapsed">Category</span>
+        </RouterLink>
+      </div>
+
+      <div class="pos-sales py-4 border-b"
+        v-if="auth.can('product.view')">
+        <p v-if="!collapsed" class="text-xs mb-2 font-bold text-neutral-500">Sales & POS</p>
+        <!-- POS Terminal  -->
+        <RouterLink
+          v-if="auth.can('product.view')"
+          to="/pos-terminal"
+          class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100"
+        >
+          <Laptop class="w-4 h-4 text-gray-600" />
+          <span v-if="!collapsed">POS Terminal</span>
         </RouterLink>
       </div>
 
@@ -108,15 +122,13 @@
       </div>
 
       <!-- Users -->
-
-
     </nav>
   </aside>
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from "@/modules/auth/store/auth.store";
-import { Sparkle, Users, Box, LayoutGrid, ListOrdered, LayersPlus, Store, FolderSymlink, NotebookText } from "lucide-vue-next";
+import { Sparkle, Users, Box, LayoutGrid, ListOrdered, LayersPlus, Store, FolderSymlink, NotebookText, Laptop } from "lucide-vue-next";
 
 defineProps<{
   collapsed: boolean;

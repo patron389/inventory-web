@@ -8,6 +8,7 @@ import WarehousePage from "@/modules/warehouse/pages/WarehousePage.vue";
 import StockPage from "@/modules/stocks/pages/StockPage.vue";
 import StockLedgerPage from "@/modules/stocks/pages/StockLedgerPage.vue";
 import StockTransferPage from "@/modules/stocks/pages/StockTransferPage.vue";
+import POSPage from "@/modules/pos/pages/POSPage.vue";
 import { useAuthStore } from "@/modules/auth/store/auth.store";
 
 const routes = [
@@ -30,7 +31,7 @@ const routes = [
       },
       {
         path: "",
-        redirect: "/dashboard", // root redirects to dashboard
+        redirect: "/dashboard", 
       },
       {
         path: "users",
@@ -73,6 +74,14 @@ const routes = [
         path: "stock-transfer",
         name: "stock-transfer",
         component: StockTransferPage,
+      },
+      {
+        path: "pos-terminal",
+        name: "pos-terminal",
+        component: POSPage,
+        meta: {
+          hideSidebar: true
+        }
       },
     ],
   },
