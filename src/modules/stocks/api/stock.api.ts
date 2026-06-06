@@ -6,16 +6,20 @@ export function fetchStocks(
   page = 1,
   search = "",
   warehouse = 1,
-  status = ""
+  status = "",
+  categoryId?: number | null,
+  brandId?: number | null
 ) {
-  return api.get<Paginated<Stock>>(`/stocks`,{
+  return api.get<Paginated<Stock>>("/stocks", {
     params: {
       page,
       search,
       warehouse_id: warehouse,
-      status
-    }
-  })
+      status,
+      category_id: categoryId,
+      brand_id: brandId,
+    },
+  });
 }
 export function fetchStockLedger(
   page = 1,

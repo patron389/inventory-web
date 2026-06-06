@@ -8,6 +8,7 @@ export interface User {
   roles: string[];
   is_active: boolean;
   permissions: string[];
+  warehouse_id:number;
 }
 export interface Role {
   id: number;

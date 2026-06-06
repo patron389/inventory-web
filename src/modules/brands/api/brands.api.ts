@@ -24,13 +24,7 @@ export const createBrand = (data: FormData) => {
   });
 };
 
-// export const updateBrand = (id: number, data: FormData) => {
-//   return api.put(`/brands/${id}`, data, {
-//     headers: {
-//       "Content-Type": "multipart/form-data",
-//     },
-//   });
-// };
+
 export const updateBrand = (id: number, data: FormData) => {
   data.append("_method", "PUT");
 
@@ -39,3 +33,14 @@ export const updateBrand = (id: number, data: FormData) => {
 // export function deleteProduct(id: number) {
 //   return api.delete(`/products/${id}`)
 // }
+
+//This is for POS
+export function fetchBrandOptions() {
+  return api.get("/brands", {
+    params: {
+      page: 1,
+      status: 1,
+      per_page: 9999,
+    },
+  });
+}

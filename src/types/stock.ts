@@ -1,10 +1,22 @@
 export interface Stock {
-    id:number,
-    product_id: number,
-    product_name: string,
-    brand: string,
-    category: string,
-    quantity: number,
+  id: number;
+
+  product_id: number;
+  product_name: string;
+  sku: string;
+
+  price: number;
+
+  brand_name: string;
+  brand_image: string | null;
+
+  category: string;
+
+  warehouse_id: number;
+
+  quantity: number;
+
+  stock_status: string;
 }
 
 export interface StockLedger {

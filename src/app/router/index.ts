@@ -80,8 +80,9 @@ const routes = [
         name: "pos-terminal",
         component: POSPage,
         meta: {
-          hideSidebar: true
-        }
+          hideSidebar: true,
+          fullscreen: true,
+        },
       },
     ],
   },

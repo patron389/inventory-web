@@ -5,6 +5,9 @@
       @update:modelValue="$emit('update:modelValue', $event)"
       title="Adjust Stock"
   >
+      <p class="text-sm text-gray-500 mb-4">
+      Stock adjustments are recorded in movement history.
+      </p>
   <Transition name="fade" mode="out-in">
     <div
       v-if="modalLoading"
@@ -19,130 +22,172 @@
       </p>
     </div>
 
-    <div v-else class="space-y-4">
-        <div class="space-y-4">
-            <SearchSelect
-            v-model="form.warehouse_id"
-            :options="warehouses"
-            label="Warehouse"
-            optionLabel="name"
-            placeholder="Select Warehouse"
-            :reduce="(b) => b.id"
-            />
-          <SearchSelect
-            v-model="form.product_id"
-            :options="products"
-            label="Product"
-            optionLabel="name"
-            placeholder="Select Product"
-            :reduce="(p) => p.id"
-            :disabled="!form.warehouse_id"
-          />
-          <div class="grid grid-cols-[1.2fr,.4fr,.4fr] gap-6">
-          <SearchSelect
-            v-model="form.adjustment_type"
-            :options="adjustmentTypes"
-            label="Adjustment Type"
-            optionLabel="label"
-            placeholder="Select Type"
-            :reduce="(t) => t.value"
-          />
-            <FormInput
-            v-model="form.quantity"
-            label="Cur. Qty"
+    <div v-else class="space-y-5">
 
-            readonly
-            />
+      <!-- Current Stock Card -->
+<!-- Current Stock -->
+<div
+  v-if="form.product_id"
+  class="border rounded-2xl bg-gray-50 p-4"
+>
+  <div class="flex items-center justify-between">
 
-          <FormInput
-            v-model="form.adjustment_quantity"
-            label="Adj. Qty"
+    <div>
+      <p class="text-sm text-gray-500">
+        Current Stock
+      </p>
 
-            type="number"
-          />
-          </div>
+      <p class="text-xs text-gray-400 mt-1">
+        Available quantity
+      </p>
+    </div>
+
+    <div class="text-right">
+      <p class="text-2xl font-bold text-blue-600">
+        {{ form.quantity }}
+      </p>
+    </div>
+
+  </div>
+</div>
+
+      <!-- Warehouse -->
+      <SearchSelect
+        v-model="form.warehouse_id"
+        :options="warehouses"
+        label="Warehouse"
+        optionLabel="name"
+        placeholder="Select Warehouse"
+        :reduce="(b) => b.id"
+      />
+
+      <!-- Product -->
+      <SearchSelect
+        v-model="form.product_id"
+        :options="products"
+        label="Product"
+        optionLabel="name"
+        placeholder="Select Product"
+        :reduce="(p) => p.id"
+        :disabled="!form.warehouse_id"
+      />
+
+      <!-- Adjustment Inputs -->
+      <div class="grid grid-cols-2 gap-4">
+
+        <SearchSelect
+          v-model="form.adjustment_type"
+          :options="adjustmentTypes"
+          label="Adjustment Type"
+          optionLabel="label"
+          placeholder="Select Type"
+          :reduce="(t) => t.value"
+        />
+
+        <FormInput
+          v-model="form.adjustment_quantity"
+          label="Quantity"
+          type="number"
+        />
+
+      </div>
+
+      <!-- Adjustment Preview -->
+      <div
+        v-if="form.adjustment_quantity && form.adjustment_type"
+        class="border rounded-xl bg-gray-50 p-4"
+      >
+        <div class="flex justify-between items-center">
+
+          <span class="text-gray-500">
+            New Stock Level
+          </span>
+
+          <span
+            class="text-lg font-semibold"
+            :class="
+              form.adjustment_type === 'deduct' &&
+              Number(form.quantity) - Number(form.adjustment_quantity) < 0
+                ? 'text-red-600'
+                : 'text-green-600'
+            "
+          >
+            {{
+              form.adjustment_type === 'add'
+                ? Number(form.quantity) + Number(form.adjustment_quantity)
+                : Number(form.quantity) - Number(form.adjustment_quantity)
+            }}
+          </span>
 
         </div>
+      </div>
 
     </div>
   </Transition>
 
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <button
-            @click="$emit('update:modelValue', false)"
-            class="px-4 py-2 bg-gray-200 rounded"
-          >
-            Cancel
-          </button>
+<template #footer>
+  <div class="flex justify-between items-center w-full">
 
-          <button
-            @click="submit"
-            :disabled="submitting"
-            class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-          >
-            {{ submitting ? "Submitting..." : "Submit" }}
-          </button>
-        </div>
-    </template>
+
+    <div class="flex gap-3 justify-end">
+      <button
+        @click="$emit('update:modelValue', false)"
+        class="px-4 py-2 border rounded-lg hover:bg-gray-50"
+      >
+        Cancel
+      </button>
+
+      <button
+        @click="submit"
+        :disabled="submitting"
+        class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+      >
+        {{ submitting ? "Saving..." : "Save Adjustment" }}
+      </button>
+    </div>
+
+  </div>
+</template>
     
   </FormModal>
 </template>
 <script setup lang="ts">
-import { reactive, ref, onMounted, watch, computed } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
 import { fetchWarehouse } from "@/modules/warehouse/api/warehouse.api";
 import FormModal from "@/shared/components/form/FormModal.vue";
 import { useStocks } from "../composables/useStocks";
 import SearchSelect from "@/shared/components/form/SearchSelect.vue";
 import FormInput from "@/shared/components/form/FormInput.vue";
-import type { Warehouse } from "@/types/warehouse"
-import {addStock, deductStock} from "../api/stock.api";
+import type { Warehouse } from "@/types/warehouse";
+import { addStock, deductStock } from "../api/stock.api";
 import { useToastStore } from "@/shared/stores/toast.store";
 import { fetchProducts } from "@/modules/products/api/products.api";
-import type { Product } from "@/types/product.type"
-const submitting = ref(false)
+import type { Product } from "@/types/product.type";
+
+const initializing = ref(false);
+const submitting = ref(false);
+const modalLoading = ref(false);
+
 const toast = useToastStore();
+
 const emit = defineEmits([
   "update:modelValue",
   "created"
 ]);
-const modalLoading = ref(false)
-const adjustmentTypes = [
-  { label: "Add Stock", value: "add" },
-  { label: "Deduct Stock", value: "deduct" }
-]
-const errors = ref<Record<string, string[]>>({});
-const warehouses = ref<Warehouse[]>([])
-const products = ref<Product[]>([])
-
 
 const props = defineProps<{
   modelValue: boolean;
   stock?: any;
 }>();
 
+const adjustmentTypes = [
+  { label: "Add Stock", value: "add" },
+  { label: "Deduct Stock", value: "deduct" }
+];
 
-const loadProducts = async () => {
-  const res = await fetchProducts()
-
-  // Products are inside paginated response
-  products.value = res.data.data
-}
-  // Load warehouse list for filter dropdown
-const loadWarehouses = async () => {
-  const res = await fetchWarehouse()
-
-  // Paginated response → warehouses are inside data.data
-  warehouses.value = res.data.data
-}
-onMounted(() => {
-  loadWarehouses()
-  loadProducts()
-})
-
-
-const { stock, loading, currentPage, lastPage, loadStocks } = useStocks();
-
+const errors = ref<Record<string, string[]>>({});
+const warehouses = ref<Warehouse[]>([]);
+const products = ref<Product[]>([]);
 
 const form = reactive({
   warehouse_id: "" as number | "",
@@ -152,81 +197,170 @@ const form = reactive({
   adjustment_quantity: "" as number | ""
 });
 
+const resetForm = () => {
+  Object.assign(form, {
+    warehouse_id: "",
+    product_id: "",
+    quantity: "",
+    adjustment_type: "",
+    adjustment_quantity: "",
+  });
 
+  errors.value = {};
+};
 
+const loadProducts = async () => {
+  const res = await fetchProducts();
+  products.value = res.data.data;
+};
+
+const loadWarehouses = async () => {
+  const res = await fetchWarehouse();
+  warehouses.value = res.data.data;
+};
+
+onMounted(() => {
+  loadWarehouses();
+  loadProducts();
+});
+
+const {
+  stock,
+  loading,
+  currentPage,
+  lastPage,
+  loadStocks
+} = useStocks();
+
+/**
+ * Load stock when editing
+ */
 watch(
   () => props.stock,
   async (newStock) => {
 
-    if (!newStock) return
+    if (!newStock) return;
 
-    modalLoading.value = true
+    initializing.value = true;
+    modalLoading.value = true;
 
     try {
 
-      await loadStocks(1, "", newStock.warehouse_id)
+      await loadStocks(
+        1,
+        "",
+        newStock.warehouse_id
+      );
 
-      form.warehouse_id = Number(newStock.warehouse_id)
-      form.product_id = Number(newStock.product_id)
-      form.quantity = Number(newStock.quantity)
+      form.warehouse_id = Number(newStock.warehouse_id);
+      form.product_id = Number(newStock.product_id);
+      form.quantity = Number(newStock.quantity);
 
     } finally {
-      modalLoading.value = false
+
+      modalLoading.value = false;
+
+      setTimeout(() => {
+        initializing.value = false;
+      }, 0);
+
     }
 
   },
   { immediate: true }
-)
+);
 
+/**
+ * Reset dependent fields when warehouse changes
+ */
+watch(
+  () => form.warehouse_id,
+  (newWarehouseId, oldWarehouseId) => {
+
+    if (initializing.value) return;
+    if (!oldWarehouseId) return;
+
+    form.product_id = "";
+    form.quantity = "";
+    form.adjustment_type = "";
+    form.adjustment_quantity = "";
+
+  }
+);
+
+/**
+ * Load stock quantity when product changes
+ */
 watch(
   () => form.product_id,
-  (productId) => {
+  async (productId) => {
 
-    if (!productId) {
-      form.quantity = ""
-      return
+    if (!productId || !form.warehouse_id) {
+      form.quantity = "";
+      return;
     }
 
+    await loadStocks(
+      1,
+      "",
+      Number(form.warehouse_id)
+    );
+
     const selectedStock = stock.value.find(
-      s => s.product_id === productId
-    )
+      s => s.product_id === Number(productId)
+    );
 
     form.quantity = selectedStock
       ? selectedStock.quantity
-      : 0
+      : 0;
 
   }
-)
+);
+
+/**
+ * Reset form when modal closes
+ */
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+
+    if (!isOpen) {
+      resetForm();
+    }
+
+  }
+);
 
 const submit = async () => {
 
   errors.value = {};
 
-  // Validation
   if (!form.adjustment_quantity) {
+
     errors.value.adjustment_quantity = [
       "Adjustment quantity is required"
-    ]
+    ];
 
     toast.show(
       "Adjustment quantity is required",
       "error"
-    )
+    );
 
-    return
+    return;
   }
 
   if (!form.adjustment_type) {
+
     errors.value.adjustment_type = [
       "Please select adjustment type"
-    ]
+    ];
 
     toast.show(
       "Please select adjustment type",
       "error"
-    )
+    );
 
-    return
+    return;
   }
 
   submitting.value = true;
@@ -247,6 +381,7 @@ const submit = async () => {
         "Stock added successfully",
         "success"
       );
+
     }
 
     if (form.adjustment_type === "deduct") {
@@ -257,19 +392,13 @@ const submit = async () => {
         "Stock deducted successfully",
         "success"
       );
+
     }
 
     emit("created");
     emit("update:modelValue", false);
 
-    // Reset form
-    Object.assign(form, {
-      warehouse_id: "",
-      product_id: "",
-      quantity: "",
-      adjustment_type: "",
-      adjustment_quantity: "",
-    });
+    resetForm();
 
   } catch (error: any) {
 
@@ -287,6 +416,7 @@ const submit = async () => {
         error.message || "Unexpected server error",
         "error"
       );
+
     }
 
   } finally {
@@ -294,5 +424,6 @@ const submit = async () => {
     submitting.value = false;
 
   }
+
 };
 </script>

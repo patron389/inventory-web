@@ -57,16 +57,30 @@
         <template #cell-index="{ index }">
           {{ (currentPage - 1) * 10 + index + 1 }}
         </template>
-        <template #cell-is_active="{ row }">
-          <span   :class="[
-                  'px-3 py-2 text-xs font-medium rounded-md',
+          <!-- Status -->
+          <template #cell-is_active="{ row }">
+
+            <span
+              :class="[
+                'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
+                row.is_active
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
+              ]"
+            >
+              <span
+                :class="[
+                  'w-2 h-2 rounded-full mr-2',
                   row.is_active
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-600'
-                ]">
-            {{ row.is_active ? 'Active' : 'Inactive' }}
-          </span>
-        </template>
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                ]"
+              ></span>
+
+              {{ row.is_active ? 'Active' : 'Inactive' }}
+            </span>
+
+          </template>
         <template #cell-brand="{ row }">
           <div class="flex items-center gap-3">
             <img

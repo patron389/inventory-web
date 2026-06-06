@@ -20,9 +20,21 @@ export function createCategory(payload: {
   name: string;}) {
   return api.post("/categories", payload);
 }
+
 export function updateCategory( 
 id:number,
 payload: {
   name: string;}) {
   return api.put(`/categories/${id}`, payload);
+}
+
+//This is for POS
+export function fetchCategoryOptions() {
+  return api.get("/categories", {
+    params: {
+      page: 1,
+      status: 1,
+      per_page: 9999,
+    },
+  });
 }

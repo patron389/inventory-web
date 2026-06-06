@@ -15,7 +15,13 @@
       <Topbar @toggle-sidebar="toggleSidebar" />
 
       <!-- Page content -->
-      <main class="flex-1 p-6 overflow-auto">
+      <main
+        :class="
+          route.meta.fullscreen
+            ? 'flex-1 overflow-hidden'
+            : 'flex-1 p-6 overflow-auto'
+        "
+      >
         <router-view />
       </main>
 

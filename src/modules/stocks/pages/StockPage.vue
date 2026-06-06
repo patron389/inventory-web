@@ -36,18 +36,22 @@
 
           <!-- Status Filter -->
            <div class="flex items-center gap-3">
-            <select
-              v-model="warehouse"
-              class="border rounded px-3 py-2"
-            >
-              <option
-                v-for="wh in warehouses"
-                :key="wh.id"
-                :value="wh.id"
+              <div
+                v-if="auth.hasRole('super_admin')"
               >
-                {{ wh.name }}
-              </option>
-            </select>
+                <select
+                  v-model="warehouse"
+                  class="border rounded px-3 py-2"
+                >
+                  <option
+                    v-for="wh in warehouses"
+                    :key="wh.id"
+                    :value="wh.id"
+                  >
+                    {{ wh.name }}
+                  </option>
+                </select>
+              </div>
             <select
               v-model="status"
               class="border rounded px-3 py-2"
